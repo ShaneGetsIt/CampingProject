@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -15,22 +14,33 @@ const string rpt = "Report.txt";
 const int COLOR = 100;
 const int MAX_ARRAY = 5;
 
+enum itemType { food, gear };
+enum priority { low, medium, high };
+
+struct inventoryItem
+{
+	string itemName;
+	itemType item = food;
+	priority prio = low;
+	int quantity = 0;
+};
+
 
 // Function prototypes
 void bannerAndInput(string& name, int& campers, int& nightsStaying, int& firesPlanned, char& ch);
-void extrasFunc(char ch, string foodList[], string gearList[], int& foodCount, int& gearCount, int length);
-void addItems(const string foodList[], const string gearList[], int foodCount, int gearCount, int length, 
-	ofstream& outData, bool raiseFlag);
-void printItems(const string foodList[], const string gearList[], int foodCount, int gearCount, int length);
+void extrasFunc(char ch, inventoryItem foodList[], inventoryItem gearList[], int& foodCount, int& gearCount, int length);
+void addItems(const inventoryItem foodList[], const inventoryItem gearList[], int foodCount, int gearCount, int length, 
+	ofstream& outData, bool& raiseFlag);
+void printItems(const inventoryItem foodList[], const inventoryItem gearList[], int foodCount, int gearCount, int length);
 void calculations(int campers, int nightsStaying, int firesPlanned, int& fireStarter,
 	double& lbsMarshmallow);
 int menuSelect();//int menu);
-void printSave(int foodCount, int gearCount, const string foodList[], const string gearList[], int length, string name,
+void printSave(int foodCount, int gearCount, const inventoryItem foodList[], const inventoryItem gearList[], int length, string name,
 	int campers, int nightsStaying, int firesPlanned, int fireStarter, double lbsMarshmallow, char ch, bool& raiseFlag);
 void itFunc(int nightsStaying, string activity, bool& itinerary);
 void colorText();
 
-enum item {food,gear};
+
 
 int main()
 {
@@ -45,16 +55,17 @@ int main()
 	double lbsMarshmallow;
 	int firesPlanned;
 	//int menu;
-	bool itinerary;
+	//bool itinerary = false;
 	bool raiseFlag = false;
-	string foodList[MAX_ARRAY];
-	string gearList[MAX_ARRAY];
+	inventoryItem foodList[MAX_ARRAY];
+	inventoryItem gearList[MAX_ARRAY];
 	int foodCount = 0;
 	int gearCount = 0;
 	//ofstream outData;
 	//ifstream inData;
 
-	colorText();
+	//colorText(); //option to change text color in console window
+
 	bannerAndInput(name, campers, nightsStaying, firesPlanned, ch);
 	extrasFunc(ch, foodList, gearList, foodCount, gearCount, MAX_ARRAY);
 	calculations(campers, nightsStaying, firesPlanned, fireStarter,
@@ -143,7 +154,7 @@ void bannerAndInput(string& name, int& campers, int& nightsStaying, int& firesPl
 //
 //}//address extrasFunc with this
 
-void extrasFunc(char ch, string foodList[], string gearList[], int& foodCount, int& gearCount, int length)
+void extrasFunc(char ch, inventoryItem foodList[], inventoryItem gearList[], int& foodCount, int& gearCount, int length)
 {
 	//ofstream outData;
 	int choice = 0;
@@ -173,17 +184,34 @@ void extrasFunc(char ch, string foodList[], string gearList[], int& foodCount, i
 				cin >> choice;
 			}
 
-			switch (static_cast<item>(choice - 1))
+			switch (static_cast<itemType>(choice - 1))
 			{
 			case food:
 
 				if (foodCount < length)
 				{
+					foodList[foodCount].item = food;
+
 					cin.ignore(50, '\n');
 					cout << "#= Enter food item name to add to list =#" << endl << endl;
 					//getline(cin,foodList[foodCount]);
-					getline(cin, foodList[foodCount]);
+					getline(cin, foodList[foodCount].itemName);
+					cout << "# Units of " << left << setfill('.') << setw(30) << foodList[foodCount].itemName
+						+ " to bring " << "#" << endl;
+					cin >> foodList[foodCount].quantity;
+					cout << "# How important is this item on a scale #" << endl
+						<< "#= of 1 (low), 2 (medium), or 3 (high)? #" << endl << endl;
+					cin >> choice;
+					while (!choice || choice < 1 || choice > 3)
+					{
+						cout << " Invalid selection - must enter int's 1-3" << endl;
+						cin.clear();
+						cin.ignore(12, '\n');
+						cin >> choice;
+					}
+					foodList[foodCount].prio = static_cast<priority>(choice - 1);
 					foodCount++;
+					
 				}
 				else
 					cout << " Limit for additional food items reached" << endl << endl;
@@ -193,10 +221,25 @@ void extrasFunc(char ch, string foodList[], string gearList[], int& foodCount, i
 
 				if (gearCount < length)
 				{
+					gearList[gearCount].item = gear;
 					cin.ignore(50, '\n');
 					cout << "#= Enter gear item name to add to list =#" << endl
 						<< "# for example: kayak, fishing rod, etc. #" << endl << endl;
-					getline(cin, gearList[gearCount]);
+					getline(cin, gearList[gearCount].itemName);
+					cout << "# Units of " << left << setfill('.') << setw(30) << gearList[gearCount].itemName
+						+ " to bring " << "#" << endl;
+					cin >> gearList[gearCount].quantity;
+					cout << "# How important is this item on a scale #" << endl
+						<< "#= of 1 (low), 2 (medium), or 3 (high)? #" << endl << endl;
+					cin >> choice;
+					while (!choice || choice < 1 || choice > 3)
+					{
+						cout << " Invalid selection - must enter int's 1-3" << endl;
+						cin.clear();
+						cin.ignore(12, '\n');
+						cin >> choice;
+					}
+					gearList[gearCount].prio = static_cast<priority>(choice - 1);
 					gearCount++;
 				}
 				else
@@ -236,8 +279,8 @@ void extrasFunc(char ch, string foodList[], string gearList[], int& foodCount, i
 
 }
 
-void addItems(const string foodList[], const string gearList[], int foodCount, int gearCount, int length, 
-	ofstream& outData, bool raiseFlag)
+void addItems(const inventoryItem foodList[], const inventoryItem gearList[], int foodCount, int gearCount, int length, 
+	ofstream& outData, bool& raiseFlag)
 {
 	int i;
 	
@@ -251,49 +294,99 @@ void addItems(const string foodList[], const string gearList[], int foodCount, i
 	if (foodCount != 0)
 	{
 		outData << right << setw(35) << setfill('-') << "-" << endl
-			<< setw(35) << setfill('.') << "Extra food to pack" << endl;
+			<< setw(27) << setfill('.') << left << "Extra food to pack" << "Priority" << endl;
 
 		for (i = 0; i < foodCount; i++)
 		{
-			outData << setw(35) << foodList[i] << endl;
+			outData << left << foodList[i].quantity << setw(30) << "x " + foodList[i].itemName;
+			if (foodList[i].prio == 0)
+			{
+				outData << right << setw(4) << "Low" << endl;
+			}
+			else if (foodList[i].prio == 1)
+			{
+				outData << right << setw(4) << "Med" << endl;
+			}
+			else if (foodList[i].prio == 2)
+			{
+				outData << right << setw(4) << "High" << endl;
+			}
 		}
 	}
 
 	if (gearCount != 0)
 	{
 		outData << right << setw(35) << setfill('-') << "-" << endl
-			<< setw(35) << setfill('.') << "Extra gear to pack" << endl;
+			<< setw(27) << setfill('.') << left << "Extra gear to pack" << "Priority" << endl;
 
 		for (i = 0; i < gearCount; i++)
 		{
-			outData << setw(35) << gearList[i] << endl;
+			outData << left << gearList[i].quantity << setw(30) << "x " + gearList[i].itemName;
+			if (gearList[i].prio == 0)
+			{
+				outData << right << setw(4) << "Low" << endl;
+			}
+			else if (gearList[i].prio == 1)
+			{
+				outData << right << setw(4) << "Med" << endl;
+			}
+			else if (gearList[i].prio == 2)
+			{
+				outData << right << setw(4) << "High" << endl;
+			}
+				//<< right << setw(4)
+				//<< gearList[i].prio << endl;
 		}
 	}
 }
 
-void printItems(const string foodList[], const string gearList[], int foodCount, int gearCount, int length)
+void printItems(const inventoryItem foodList[], const inventoryItem gearList[], int foodCount, int gearCount, int length)
 {
 	int i;
 
 	if (foodCount != 0)
 	{
 		cout << right << setw(35) << setfill('-') << "-" << endl
-			<< setw(35) << setfill('.') << "Extra food to pack" << endl;
+			<< setw(27) << setfill('.') << left << "Extra food to pack" << "Priority" << endl;
 
 		for (i = 0; i < foodCount; i++)
 		{
-			cout << setw(35) << foodList[i] << endl;
+			cout << left << foodList[i].quantity << setw(30) << "x " + foodList[i].itemName;
+			if (foodList[i].prio == 0)
+			{
+				cout << right << setw(4) << "Low" << endl;
+			}
+			else if (foodList[i].prio == 1)
+			{
+				cout << right << setw(4) << "Med" << endl;
+			}
+			else if (foodList[i].prio == 2)
+			{
+				cout << right << setw(4) << "High" << endl;
+			}
 		}
 	}
 
 	if (gearCount != 0)
 	{
 		cout << right << setw(35) << setfill('-') << "-" << endl
-			<< setw(35) << setfill('.') << "Extra gear to pack" << endl;
+			<< setw(27) << setfill('.') << left << "Extra gear to pack" << "Priority" << endl;
 
 		for (i = 0; i < gearCount; i++)
 		{
-			cout << setw(35) << gearList[i] << endl;
+			cout << left << gearList[i].quantity << setw(30) << "x " + gearList[i].itemName;
+			if (gearList[i].prio == 0)
+			{
+				cout << right << setw(4) << "Low" << endl;
+			}
+			else if (gearList[i].prio == 1)
+			{
+				cout << right << setw(4) << "Med" << endl;
+			}
+			else if (gearList[i].prio == 2)
+			{
+				cout << right << setw(4) << "High" << endl;
+			}
 		}
 	}
 }
@@ -325,17 +418,17 @@ int menuSelect()//int menu)
 	return menu;
 }
 
-void printSave(int foodCount, int gearCount, const string foodList[], const string gearList[], int length, string name, 
+void printSave(int foodCount, int gearCount, const inventoryItem foodList[], const inventoryItem gearList[], int length, string name, 
 	int campers, int nightsStaying, int firesPlanned, int fireStarter, double lbsMarshmallow, char ch, bool& raiseFlag)
 
 {
 	int menu;
 	string activity;
 	string extraItem;
-	bool itinerary;
+	bool itinerary = false;
 	ofstream outData;
 	ifstream inData;
-	//bool raiseFlag = false;
+	//raiseFlag = false;
 
 	do {
 
