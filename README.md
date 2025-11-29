@@ -1,4 +1,4 @@
-# My first C++ Program
+# C++ Programming Project
 This is the C++ programming project for ITCS-2530.
 The program is a camping-packing assistant.
 The program takes several user inputs regarding the user's upcoming trip.
