@@ -14,9 +14,10 @@ The subsequent 3 user inputs ask for an integer value, but will only display
 up to 2 digits - please bear this in mind.
 
 If you wish to add extra items to the supply list, enter Y or y when prompted.
+You will be asked to enter '1' for food, '2' for gear and '3' when finished.
 The extra items prompt takes string inputs, but will only print out to 21 characters.
-You must enter each additional item one at a timne; when you are done entering
-additional items, enter "done".
+You must enter each additional item one at a time; when you are done entering
+additional items, enter "3".
 
 Once the user's information has been collected, the menu will be displayed;
 User will be asked to either create(an)/replace(the existing) itinerary,
