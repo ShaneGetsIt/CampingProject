@@ -64,7 +64,7 @@ int main()
 	//ofstream outData;
 	//ifstream inData;
 
-	//colorText(); //option to change text color in console window
+	colorText(); //option to change text color in console window
 
 	bannerAndInput(name, campers, nightsStaying, firesPlanned, ch);
 	extrasFunc(ch, foodList, gearList, foodCount, gearCount, MAX_ARRAY);
