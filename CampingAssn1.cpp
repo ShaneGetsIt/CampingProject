@@ -22,13 +22,15 @@ int main()
     int foodCount = 0;
     int gearCount = 0;
 
-    // run program flow via SupplyList implementation
-    sl.colorText();
-    sl.bannerAndInput(name, campers, nightsStaying, firesPlanned, ch);
-    sl.extrasFunc(ch, foodList, gearList, foodCount, gearCount, SupplyList::MAX_ARRAY);
-    sl.calculations(campers, nightsStaying, firesPlanned, fireStarter, lbsMarshmallow);
-    sl.printSave(foodCount, gearCount, foodList, gearList, SupplyList::MAX_ARRAY, name, campers, nightsStaying,
-        firesPlanned, fireStarter, lbsMarshmallow, ch, raiseFlag);
+	//colorText(); //option to change text color in console window
+
+	bannerAndInput(name, campers, nightsStaying, firesPlanned, ch);
+	extrasFunc(ch, foodList, gearList, foodCount, gearCount, MAX_ARRAY);
+	calculations(campers, nightsStaying, firesPlanned, fireStarter,
+		lbsMarshmallow);
+	//void menuSelect(int& menu);
+	printSave(foodCount, gearCount, foodList, gearList, MAX_ARRAY, name, campers, nightsStaying, 
+		firesPlanned, fireStarter, lbsMarshmallow, ch, raiseFlag);
 
     if (raiseFlag)
     {
