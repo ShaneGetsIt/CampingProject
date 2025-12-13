@@ -18,5 +18,13 @@
     <ClCompile Include="CampingAssn1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SupplyList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SupplyList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
