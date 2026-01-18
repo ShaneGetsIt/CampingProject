@@ -191,7 +191,7 @@ void printSave(SupplyList& supply, int length, string name,
 
 			}
 			cout << "#*********************************#" << endl;
-			cout << setw(19) << setfill('.') << name    //name the camping list
+			cout << right << setw(19) << setfill('.') << name    //name the camping list
 				<< left << "'s Camp Supplies" << endl
 				<< showpoint << fixed << setprecision(2) //will only apply to lbsMarshmallow variable
 				<< setw(28) << "Size of camping party:"
