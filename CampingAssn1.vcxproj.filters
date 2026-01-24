@@ -26,5 +26,11 @@
     <ClInclude Include="SupplyList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="doctest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TESTING_README.md" />
   </ItemGroup>
 </Project>

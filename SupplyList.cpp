@@ -209,3 +209,87 @@ void SupplyList::printItems(int length)
     }
 }
 
+// Test-friendly methods (non-interactive)
+
+// Add food item without user interaction; returns false if list is full
+bool SupplyList::addFoodItem(const inventoryItem& item)
+{
+    if (foodCount >= MAX_ARRAY) return false;
+    foodList[foodCount++] = item;
+    return true;
+}
+
+// Add gear item without user interaction; returns false if list is full
+bool SupplyList::addGearItem(const inventoryItem& item)
+{
+    if (gearCount >= MAX_ARRAY) return false;
+    gearList[gearCount++] = item;
+    return true;
+}
+
+// Get current food count
+int SupplyList::getFoodCount() const
+{
+    return foodCount;
+}
+
+// Get current gear count
+int SupplyList::getGearCount() const
+{
+    return gearCount;
+}
+
+// Get total item count (food + gear)
+int SupplyList::getTotalItemCount() const
+{
+    return foodCount + gearCount;
+}
+
+// Calculate average food quantity (guards against divide by zero)
+double SupplyList::getAverageFoodQuantity() const
+{
+    if (foodCount == 0) return 0.0;
+    
+    int total = 0;
+    for (int i = 0; i < foodCount; i++)
+    {
+        total += foodList[i].quantity;
+    }
+    return static_cast<double>(total) / foodCount;
+}
+
+// Convert priority enum to string using switch
+string SupplyList::getPriorityString(priority prio) const
+{
+    switch (prio)
+    {
+    case low:
+        return "Low";
+    case medium:
+        return "Med";
+    case high:
+        return "High";
+    default:
+        return "Unknown";
+    }
+}
+
+// Get food item at index (for testing)
+const inventoryItem& SupplyList::getFoodItem(int index) const
+{
+    return foodList[index];
+}
+
+// Get gear item at index (for testing)
+const inventoryItem& SupplyList::getGearItem(int index) const
+{
+    return gearList[index];
+}
+
+// Clear all items (for testing)
+void SupplyList::clearAll()
+{
+    foodCount = 0;
+    gearCount = 0;
+}
+

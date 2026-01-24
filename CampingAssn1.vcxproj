@@ -127,7 +127,11 @@
     <ClCompile Include="SupplyList.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="doctest.h" />
     <ClInclude Include="SupplyList.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TESTING_README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

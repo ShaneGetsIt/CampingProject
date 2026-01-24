@@ -1,9 +1,14 @@
+// Main program: gathers trip info, uses SupplyList to collect extras, and prints/saves report
+#ifdef _DEBUG
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#endif
+#include "doctest.h"
 #include "SupplyList.h"
 
-const string extras = "Extras.txt";
-const string it = "It.txt";
-const string rpt = "Report.txt";
-const int COLOR = 100;
+const string extras = "Extras.txt"; // legacy filenames
+const string it = "It.txt";         // itinerary file
+const string rpt = "Report.txt";    // report output file
+const int COLOR = 100;              // console color attribute
 
 // Function prototypes
 void bannerAndInput(string& name, int& campers, int& nightsStaying, int& firesPlanned, char& ch);
@@ -15,11 +20,126 @@ void printSave(SupplyList& supply, int length, string name,
 void itFunc(int nightsStaying, string activity, bool& itinerary);
 void colorText();
 
+// Helper functions for calculations (testable)
+void calculateFireStarters(int firesPlanned, int nightsStaying, int& fireStarter)
+{
+	//initialize fireStarter variable; set # of fire starters to bring = fires
+	//planned per day times the # of nights the user plans to be camping
+	fireStarter = firesPlanned * nightsStaying;
+}
 
+void calculateMarshmallows(int fireStarter, int campers, double& lbsMarshmallow)
+{
+	//initialize lbsMarshmallow variable; set weight of marshmallow to bring = total # 
+	//of campfires planned during the user's stay times the number of campers; then 
+	//divide by 4, this assumes each person will consume .25 lbs of marshmallow per fire
+	lbsMarshmallow = (fireStarter * campers) / 4.0;
+	//lbsMarshmallow should be appropriate for the "derived value" requirement
+}
 
+// ============= UNIT TESTS =============
+
+// A) Calculations - exactly 4 tests (derived values, averages, ratios)
+TEST_CASE("Calculations: Fire starters - normal case") {
+	int fireStarter = 0;
+	calculateFireStarters(2, 3, fireStarter);
+	CHECK(fireStarter == 6);
+}
+
+TEST_CASE("Calculations: Fire starters - edge case with 0") {
+	int fireStarter = 0;
+	calculateFireStarters(0, 5, fireStarter);
+	CHECK(fireStarter == 0);
+}
+
+TEST_CASE("Calculations: Marshmallow weight - normal case") {
+	double lbsMarshmallow = 0.0;
+	calculateMarshmallows(8, 4, lbsMarshmallow);
+	CHECK(lbsMarshmallow == doctest::Approx(8.0));
+}
+
+TEST_CASE("Calculations: Average food quantity - guard divide by zero") {
+	SupplyList supply;
+	CHECK(supply.getAverageFoodQuantity() == doctest::Approx(0.0));
+}
+
+// B) Enum decision logic - exactly 3 tests (if/switch based on enum)
+TEST_CASE("Enum: Priority to string - low") {
+	SupplyList supply;
+	CHECK(supply.getPriorityString(low) == "Low");
+}
+
+TEST_CASE("Enum: Priority to string - medium") {
+	SupplyList supply;
+	CHECK(supply.getPriorityString(medium) == "Med");
+}
+
+TEST_CASE("Enum: Priority to string - high") {
+	SupplyList supply;
+	CHECK(supply.getPriorityString(high) == "High");
+}
+
+// C) Struct/array processing - exactly 3 tests
+TEST_CASE("Array: Add food items and count") {
+	SupplyList supply;
+	inventoryItem item1 = { "Rice", food, low, 2 };
+	inventoryItem item2 = { "Pasta", food, medium, 3 };
+	
+	supply.addFoodItem(item1);
+	supply.addFoodItem(item2);
+	
+	CHECK(supply.getFoodCount() == 2);
+}
+
+TEST_CASE("Array: Total items - food plus gear") {
+	SupplyList supply;
+	inventoryItem food1 = { "Bread", food, low, 5 };
+	inventoryItem gear1 = { "Rope", gear, medium, 2 };
+	
+	supply.addFoodItem(food1);
+	supply.addGearItem(gear1);
+	
+	CHECK(supply.getTotalItemCount() == 2);
+}
+
+TEST_CASE("Array: Boundary - reject when full") {
+	SupplyList supply;
+	inventoryItem item = { "Item", food, low, 1 };
+	
+	// Fill to capacity
+	for (int i = 0; i < MAX_ARRAY; i++) {
+		supply.addFoodItem(item);
+	}
+	
+	// Should fail when full
+	CHECK(supply.addFoodItem(item) == false);
+}
+
+// D) Class methods - exactly 2 tests
+TEST_CASE("Class: addFoodItem success") {
+	SupplyList supply;
+	inventoryItem item = { "Apples", food, medium, 10 };
+	
+	CHECK(supply.addFoodItem(item) == true);
+	CHECK(supply.getFoodCount() == 1);
+}
+
+TEST_CASE("Class: clearAll resets") {
+	SupplyList supply;
+	inventoryItem item = { "Test", food, low, 1 };
+	
+	supply.addFoodItem(item);
+	supply.clearAll();
+	
+	CHECK(supply.getFoodCount() == 0);
+}
+
+// ============= MAIN PROGRAM =============
+
+#ifndef _DEBUG
 int main()
 {
-	// these are the variables to hold user input
+	// Program mode: run normal camping list generator
 	string name;
 	string extraItem;
 	char ch;
@@ -46,7 +166,6 @@ int main()
 		return 1;
 	}
 
-
 	cout << "# Thanks for allowing me to assist you  #" << endl
 		<< "# with planning! I hope you found this  #" << endl
 		<< "# tool to be helpful - enjoy your trip! #"
@@ -54,7 +173,7 @@ int main()
 
 	return 0;
 }
-
+#endif
 
 void bannerAndInput(string& name, int& campers, int& nightsStaying, int& firesPlanned, char& ch)
 {
@@ -67,7 +186,7 @@ void bannerAndInput(string& name, int& campers, int& nightsStaying, int& firesPl
 
 	getline(cin, name);
 
-	cout << endl << endl << "#== Okay, " << left << setfill('=')
+	cout << endl << endl << "#== Okay, " << left << setfill('=') 
 		<< setw(25) << name + "  " << "=====#" << endl
 		<< "#== and how many campers will be going, #" << endl
 		<< "#=================  including yourself? #" << endl << endl;
@@ -118,19 +237,11 @@ void bannerAndInput(string& name, int& campers, int& nightsStaying, int& firesPl
 void calculations(int campers, int nightsStaying, int firesPlanned, int& fireStarter,
 	double& lbsMarshmallow)
 {
-	//initialize fireStarter variable; set # of fire starters to bring = fires
-//planned per day times the # of nights the user plans to be camping
-	fireStarter = firesPlanned * nightsStaying;
-
-	//initialize lbsMarshmallow variable; set weight of marshmallow to bring = total # 
-	//of campfires planned during the user's stay times the number of campers; then 
-	//divide by 4, this assumes each person will consume .25 lbs of marshmallow per fire
-	lbsMarshmallow = (fireStarter * campers) / 4.0;
-	//lbsMarshmallow should be appropriate for the "derived value" requirement
-
+	calculateFireStarters(firesPlanned, nightsStaying, fireStarter);
+	calculateMarshmallows(fireStarter, campers, lbsMarshmallow);
 }
 
-int menuSelect()
+int menuSelect()//int menu)
 {
 	int menu;
 	cout << "#---- How would you like to proceed? ---#" << endl << endl
@@ -331,6 +442,8 @@ void itFunc(int nightsStaying, string activity, bool& itinerary)
 	outData.close();
 	cout << "# Perfect! I've created your ===========#" << endl
 		<< "#=============  personalized itinerary. #" << endl;
+	//break;
+
 }
 
 void colorText()

@@ -37,6 +37,18 @@ public:
     // Print extra items to console
     void printItems(int length);
 
+    // Test-friendly methods (non-interactive)
+    bool addFoodItem(const inventoryItem& item);
+    bool addGearItem(const inventoryItem& item);
+    int getFoodCount() const;
+    int getGearCount() const;
+    int getTotalItemCount() const;
+    double getAverageFoodQuantity() const;
+    string getPriorityString(priority prio) const;
+    const inventoryItem& getFoodItem(int index) const;
+    const inventoryItem& getGearItem(int index) const;
+    void clearAll();
+
 private:
     inventoryItem foodList[MAX_ARRAY]; // stored extra food items
     inventoryItem gearList[MAX_ARRAY]; // stored extra gear items
