@@ -23,3 +23,6 @@ Once the user's information has been collected, the menu will be displayed;
 User will be asked to either create(an)/replace(the existing) itinerary,
 save the report AND display it on the console or save the file only.
 Simply enter 1,2 or 3. Thanks for reading!
+
+
+![Tests](https://github.com/ShaneGetsIt/CampingProject/actions/workflows/tests.yml/badge.svg)
