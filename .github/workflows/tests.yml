@@ -1,0 +1,26 @@
+name: C++ doctest (Windows)
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Build tests
+        shell: cmd
+        run: |
+          cl /nologo /EHsc /std:c++14 /D_DEBUG CampingAssn1.cpp SupplyList.cpp /Fe:CampingAssn1_tests.exe
+
+      - name: Run tests
+        shell: cmd
+        run: |
+          CampingAssn1_tests.exe
