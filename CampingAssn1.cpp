@@ -1,5 +1,5 @@
 // Main program: gathers trip info, uses SupplyList to collect extras, and prints/saves report
-#ifdef _DEBUG
+#if defined(_DEBUG) || defined(RUN_TESTS)
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #endif
 #include "doctest.h"
@@ -134,9 +134,9 @@ TEST_CASE("Class: clearAll resets") {
 	CHECK(supply.getFoodCount() == 0);
 }
 
-// ============= MAIN PROGRAM =============
+// ============= MAIN PROGRAM (only in program mode) =============
 
-#ifndef _DEBUG
+#if !defined(_DEBUG) && !defined(RUN_TESTS)
 int main()
 {
 	// Program mode: run normal camping list generator
