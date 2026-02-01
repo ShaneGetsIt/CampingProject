@@ -3,7 +3,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #endif
 #include "doctest.h"
-#include "SupplyList.h"
+#include "SupplyList.h"  // SupplyList class definition
 
 const string extras = "Extras.txt"; // legacy filenames
 const string it = "It.txt";         // itinerary file
