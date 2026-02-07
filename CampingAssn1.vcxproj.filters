@@ -62,5 +62,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="TESTING_README.md" />
+    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
 </Project>
