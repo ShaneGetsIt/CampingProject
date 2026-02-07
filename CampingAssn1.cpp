@@ -193,7 +193,7 @@ TEST_CASE("HikingSupplies: addHikingEssentials uses base addItem methods") {
 	CHECK(hiking.getTotalItemCount() > 0);
 }
 
-// G) Derived class tests - LogSelect extends Menu
+// G) Derived class tests - LogSelect extends Menu 
 TEST_CASE("LogSelect: Derives from Menu correctly") {
 	LogSelect logMenu("TestUser");
 	
