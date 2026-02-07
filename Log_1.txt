@@ -1,0 +1,9 @@
+#*********************************#
+#     Camping Log: log1
+#*********************************#
+
+Nights: 1
+Activities: 0
+
+Food items: 2
+Gear items: 1

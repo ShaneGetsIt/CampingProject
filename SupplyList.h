@@ -11,24 +11,29 @@ using namespace std;
 // Max extra items per category
 const int MAX_ARRAY = 5;
 
-// Types for items and priority
-enum itemType { food, gear };
+// Global priority enum (used across multiple base classes)
 enum priority { low, medium, high };
-
-// Simple POD to hold an inventory item
-struct inventoryItem
-{
-    string itemName;
-    itemType item = food;
-    priority prio = low;
-    int quantity = 0;
-};
 
 // SupplyList encapsulates additional food/gear items entered by user
 class SupplyList
 {
 public:
-    SupplyList() {}// default constructor
+    // Nested types (moved inside class)
+    enum itemType { food, gear };
+    
+    struct inventoryItem
+    {
+        string itemName;
+        itemType item = food;
+        priority prio = low;
+        int quantity = 0;
+    };
+
+    // Default constructor
+    SupplyList();
+    
+    // Parameterized constructor (makes this a proper base class)
+    SupplyList(string name, int capacity, priority prio);
 
     // Collect extras from user (interactive)
     void extrasFunc(char ch, int length);
@@ -48,6 +53,22 @@ public:
     const inventoryItem& getFoodItem(int index) const;
     const inventoryItem& getGearItem(int index) const;
     void clearAll();
+    
+    // Getters for base class data
+    string getListName() const;
+    int getMaxCapacity() const;
+    priority getListPriority() const;
+    
+    // Setters for base class data
+    void setListName(string name);
+    void setMaxCapacity(int capacity);
+    void setListPriority(priority prio);
+
+protected:
+    // Base class data members (required by assignment)
+    string listName;           // Name of this supply list
+    int maxCapacity;           // Maximum items
+    priority listPriority;     // Overall priority of this supply category
 
 private:
     inventoryItem foodList[MAX_ARRAY]; // stored extra food items

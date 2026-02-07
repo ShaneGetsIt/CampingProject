@@ -1,17 +1,14 @@
 #*********************************#
-..............shane's Camp Supplies
-Size of camping party:............2
-Duration of stay:.................2
+...................'s Camp Supplies
+Size of camping party:............1
+Duration of stay:.................1
 #---------------------------------#
 #---------------------------------#
 #.........Things to pack..........#
 Need: 1x 2-man OR 1x 5-man tent(s)
-- - - Sleeping bags...............2
-- - - Fire starters...............4
-- - - Lbs of Marshmallow.......2.00
------------------------------------
-Extra food to pack.........Priority
-1x food.........................Low
+- - - Sleeping bags...............1
+- - - Fire starters...............1
+- - - Lbs of Marshmallow.......0.25
 #---------------------------------#
 ......And lots of camping spirit!!!
 #*********************************#

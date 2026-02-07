@@ -1,5 +1,49 @@
 #include "SupplyList.h"
 
+// Default constructor
+SupplyList::SupplyList()
+    : listName("General Supplies"), maxCapacity(MAX_ARRAY), listPriority(medium), foodCount(0), gearCount(0)
+{
+}
+
+// Parameterized constructor
+SupplyList::SupplyList(string name, int capacity, priority prio)
+    : listName(name), maxCapacity(capacity), listPriority(prio), foodCount(0), gearCount(0)
+{
+}
+
+// Getters for base class data
+string SupplyList::getListName() const
+{
+    return listName;
+}
+
+int SupplyList::getMaxCapacity() const
+{
+    return maxCapacity;
+}
+
+priority SupplyList::getListPriority() const
+{
+    return listPriority;
+}
+
+// Setters for base class data
+void SupplyList::setListName(string name)
+{
+    listName = name;
+}
+
+void SupplyList::setMaxCapacity(int capacity)
+{
+    maxCapacity = capacity;
+}
+
+void SupplyList::setListPriority(priority prio)
+{
+    listPriority = prio;
+}
+
 // Prompt user to add extra food/gear items and store them in the lists
 void SupplyList::extrasFunc(char ch, int length)
 {
@@ -275,13 +319,13 @@ string SupplyList::getPriorityString(priority prio) const
 }
 
 // Get food item at index (for testing)
-const inventoryItem& SupplyList::getFoodItem(int index) const
+const SupplyList::inventoryItem& SupplyList::getFoodItem(int index) const
 {
     return foodList[index];
 }
 
 // Get gear item at index (for testing)
-const inventoryItem& SupplyList::getGearItem(int index) const
+const SupplyList::inventoryItem& SupplyList::getGearItem(int index) const
 {
     return gearList[index];
 }

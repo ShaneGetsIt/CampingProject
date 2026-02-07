@@ -124,10 +124,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CampingAssn1.cpp" />
+    <ClCompile Include="HikingSupplies.cpp" />
+    <ClCompile Include="Itin.cpp" />
+    <ClCompile Include="Logs.cpp" />
+    <ClCompile Include="LogSelect.cpp" />
+    <ClCompile Include="Menu.cpp" />
     <ClCompile Include="SupplyList.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="doctest.h" />
+    <ClInclude Include="HikingSupplies.h" />
+    <ClInclude Include="Itin.h" />
+    <ClInclude Include="Logs.h" />
+    <ClInclude Include="LogSelect.h" />
+    <ClInclude Include="Menu.h" />
     <ClInclude Include="SupplyList.h" />
   </ItemGroup>
   <ItemGroup>

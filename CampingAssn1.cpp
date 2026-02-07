@@ -4,6 +4,11 @@
 #endif
 #include "doctest.h"
 #include "SupplyList.h"  // SupplyList class definition
+#include "Itin.h"        // Itin class definition
+#include "HikingSupplies.h"  // HikingSupplies class definition
+#include "Menu.h"        // Menu class definition
+#include "Logs.h"        // Logs class definition
+#include "LogSelect.h"   // LogSelect class definition
 
 const string extras = "Extras.txt"; // legacy filenames
 const string it = "It.txt";         // itinerary file
@@ -14,27 +19,20 @@ const int COLOR = 100;              // console color attribute
 void bannerAndInput(string& name, int& campers, int& nightsStaying, int& firesPlanned, char& ch);
 void calculations(int campers, int nightsStaying, int firesPlanned, int& fireStarter,
 	double& lbsMarshmallow);
-int menuSelect();
-void printSave(SupplyList& supply, int length, string name,
-	int campers, int nightsStaying, int firesPlanned, int fireStarter, double lbsMarshmallow, char ch, bool& raiseFlag);
-void itFunc(int nightsStaying, string activity, bool& itinerary);
+void printSave(SupplyList& supply, Itin& itinerary, HikingSupplies& hikingSupplies, bool hasHikingSupplies, 
+	int length, string name, int campers, int nightsStaying, int firesPlanned, int fireStarter, 
+	double lbsMarshmallow, char ch, bool& raiseFlag);
 void colorText();
 
 // Helper functions for calculations (testable)
 void calculateFireStarters(int firesPlanned, int nightsStaying, int& fireStarter)
 {
-	//initialize fireStarter variable; set # of fire starters to bring = fires
-	//planned per day times the # of nights the user plans to be camping
 	fireStarter = firesPlanned * nightsStaying;
 }
 
 void calculateMarshmallows(int fireStarter, int campers, double& lbsMarshmallow)
 {
-	//initialize lbsMarshmallow variable; set weight of marshmallow to bring = total # 
-	//of campfires planned during the user's stay times the number of campers; then 
-	//divide by 4, this assumes each person will consume .25 lbs of marshmallow per fire
 	lbsMarshmallow = (fireStarter * campers) / 4.0;
-	//lbsMarshmallow should be appropriate for the "derived value" requirement
 }
 
 // ============= UNIT TESTS =============
@@ -82,8 +80,8 @@ TEST_CASE("Enum: Priority to string - high") {
 // C) Struct/array processing - exactly 3 tests
 TEST_CASE("Array: Add food items and count") {
 	SupplyList supply;
-	inventoryItem item1 = { "Rice", food, low, 2 };
-	inventoryItem item2 = { "Pasta", food, medium, 3 };
+	SupplyList::inventoryItem item1 = { "Rice", SupplyList::food, low, 2 };
+	SupplyList::inventoryItem item2 = { "Pasta", SupplyList::food, medium, 3 };
 	
 	supply.addFoodItem(item1);
 	supply.addFoodItem(item2);
@@ -93,8 +91,8 @@ TEST_CASE("Array: Add food items and count") {
 
 TEST_CASE("Array: Total items - food plus gear") {
 	SupplyList supply;
-	inventoryItem food1 = { "Bread", food, low, 5 };
-	inventoryItem gear1 = { "Rope", gear, medium, 2 };
+	SupplyList::inventoryItem food1 = { "Bread", SupplyList::food, low, 5 };
+	SupplyList::inventoryItem gear1 = { "Rope", SupplyList::gear, medium, 2 };
 	
 	supply.addFoodItem(food1);
 	supply.addGearItem(gear1);
@@ -104,7 +102,7 @@ TEST_CASE("Array: Total items - food plus gear") {
 
 TEST_CASE("Array: Boundary - reject when full") {
 	SupplyList supply;
-	inventoryItem item = { "Item", food, low, 1 };
+	SupplyList::inventoryItem item = { "Item", SupplyList::food, low, 1 };
 	
 	// Fill to capacity
 	for (int i = 0; i < MAX_ARRAY; i++) {
@@ -118,7 +116,7 @@ TEST_CASE("Array: Boundary - reject when full") {
 // D) Class methods - exactly 2 tests
 TEST_CASE("Class: addFoodItem success") {
 	SupplyList supply;
-	inventoryItem item = { "Apples", food, medium, 10 };
+	SupplyList::inventoryItem item = { "Apples", SupplyList::food, medium, 10 };
 	
 	CHECK(supply.addFoodItem(item) == true);
 	CHECK(supply.getFoodCount() == 1);
@@ -126,12 +124,117 @@ TEST_CASE("Class: addFoodItem success") {
 
 TEST_CASE("Class: clearAll resets") {
 	SupplyList supply;
-	inventoryItem item = { "Test", food, low, 1 };
+	SupplyList::inventoryItem item = { "Test", SupplyList::food, low, 1 };
 	
 	supply.addFoodItem(item);
 	supply.clearAll();
 	
 	CHECK(supply.getFoodCount() == 0);
+}
+
+// ============= ADDITIONAL TESTS FOR NEW CLASSES =============
+
+// E) Constructor and getter/setter tests
+TEST_CASE("Menu: Constructor initializes fields correctly") {
+	Menu testMenu("TestUser", 3, high);
+	CHECK(testMenu.getUserName() == "TestUser");
+	CHECK(testMenu.getNumOptions() == 3);
+	CHECK(testMenu.getMenuPriority() == high);
+}
+
+TEST_CASE("Menu: Setters work correctly") {
+	Menu testMenu;
+	testMenu.setUserName("Alice");
+	testMenu.setNumOptions(5);
+	testMenu.setOption(0, "Option 1");
+	
+	CHECK(testMenu.getUserName() == "Alice");
+	CHECK(testMenu.getNumOptions() == 5);
+	CHECK(testMenu.getOption(0) == "Option 1");
+}
+
+TEST_CASE("Itin: Constructor initializes nights correctly") {
+	Itin trip(5, high);
+	CHECK(trip.getNightsStaying() == 5);
+	CHECK(trip.getActivityCount() == 0);
+}
+
+TEST_CASE("Itin: addActivity increases count") {
+	Itin trip(3, medium);
+	trip.addActivity("Hiking", high);
+	trip.addActivity("Fishing", low);
+	
+	CHECK(trip.getActivityCount() == 2);
+	CHECK(trip.getActivity(0) == "Hiking");
+	CHECK(trip.getActivity(1) == "Fishing");
+}
+
+// F) Derived class tests - HikingSupplies calls base behavior
+TEST_CASE("HikingSupplies: Derives from SupplyList correctly") {
+	HikingSupplies hiking("Trail Gear", 10, high, 2, 5.5);
+	
+	// Base class properties accessible
+	CHECK(hiking.getListName() == "Trail Gear");
+	CHECK(hiking.getMaxCapacity() == 10);
+	CHECK(hiking.getListPriority() == high);
+	
+	// Derived class properties
+	CHECK(hiking.getTrailDifficulty() == 2);
+	CHECK(hiking.getDistanceMiles() == doctest::Approx(5.5));
+}
+
+TEST_CASE("HikingSupplies: addHikingEssentials uses base addItem methods") {
+	HikingSupplies hiking("Test", 20, medium, 3, 10.0);
+	hiking.addHikingEssentials();
+	
+	// Should have added items using base class methods
+	CHECK(hiking.getFoodCount() > 0);  // At least water bottles + energy bars for difficulty 3
+	CHECK(hiking.getGearCount() > 0);  // At least map, first aid, shelter, GPS for difficulty 3
+	CHECK(hiking.getTotalItemCount() > 0);
+}
+
+// G) Derived class tests - LogSelect extends Menu
+TEST_CASE("LogSelect: Derives from Menu correctly") {
+	LogSelect logMenu("TestUser");
+	
+	// Base class property accessible
+	CHECK(logMenu.getUserName() == "TestUser");
+	
+	// Derived class property
+	CHECK(logMenu.getSelectedLogNumber() == 0);  // Default value
+}
+
+// H) Composition class tests - Logs aggregates Itin and SupplyList
+TEST_CASE("Logs: Composition - contains Itin and SupplyList") {
+	Itin testItin(3, medium);
+	testItin.addActivity("Kayaking", high);
+	
+	SupplyList testSupply("Camp Gear", 10, medium);
+	SupplyList::inventoryItem item = { "Tent", SupplyList::gear, high, 1 };
+	testSupply.addGearItem(item);
+	
+	Logs testLog("Summer Trip", testItin, testSupply);
+	
+	// Logs contains copies of both objects
+	CHECK(testLog.getLogName() == "Summer Trip");
+	CHECK(testLog.getItinerary().getNightsStaying() == 3);
+	CHECK(testLog.getItinerary().getActivityCount() == 1);
+	CHECK(testLog.getSupplies().getGearCount() == 1);
+}
+
+TEST_CASE("Logs: Static counter persists across instances") {
+	int initialCount = Logs::getTotalLogs();
+	
+	Itin itin1(2, low);
+	SupplyList supply1;
+	Logs log1("Trip1", itin1, supply1);
+	
+	Itin itin2(3, high);
+	SupplyList supply2;
+	Logs log2("Trip2", itin2, supply2);
+	
+	// Counter should be same for both (static member)
+	CHECK(Logs::getTotalLogs() == initialCount);  // Not incremented unless saveLog() called
 }
 
 // ============= MAIN PROGRAM (only in program mode) =============
@@ -151,19 +254,90 @@ int main()
 	bool raiseFlag = false;
 	SupplyList supply;
 
-	colorText(); //option to change text color in console window
+	colorText();
+
+	// Load log count at program start
+	Logs::loadLogCount();
+
+	// Option to view previous logs using LogSelect
+	cout << "# Would you like to view previous trip logs? (Y/N) #" << endl;
+	char viewLogs;
+	cin >> viewLogs;
+	cin.ignore(50, '\n');
+
+	if (viewLogs == 'Y' || viewLogs == 'y')
+	{
+		LogSelect logMenu("Guest");
+		logMenu.selectLog();
+		cout << endl;
+		
+		// Clear input stream before proceeding to bannerAndInput
+		cin.clear();
+		cin.ignore(50, '\n');
+	}
 
 	bannerAndInput(name, campers, nightsStaying, firesPlanned, ch);
+	
+	// Create Itin object with nightsStaying from user input
+	Itin itinerary(nightsStaying, medium);
+	
 	supply.extrasFunc(ch, MAX_ARRAY);
+	
+	// Ask about hiking supplies (optional) - stack allocated
+	char hikingChoice;
+	HikingSupplies hikingSupplies;  // Default constructed on stack
+	bool hasHikingSupplies = false;
+	
+	cout << endl << "# Will this trip involve hiking? (Y/N) #" << endl;
+	cin >> hikingChoice;
+	cin.ignore(50, '\n');
+	
+	if (hikingChoice == 'Y' || hikingChoice == 'y')
+	{
+		int difficulty;
+		double distance;
+		
+		cout << "# Enter trail difficulty (1=Easy, 2=Moderate, 3=Difficult): ";
+		cin >> difficulty;
+		cin.ignore(50, '\n');
+		
+		cout << "# Enter distance in miles: ";
+		cin >> distance;
+		cin.ignore(50, '\n');
+		
+		// Set hiking supplies properties
+		hikingSupplies = HikingSupplies("Hiking Gear", MAX_ARRAY, high, difficulty, distance);
+		hikingSupplies.addHikingEssentials();
+		hasHikingSupplies = true;
+		
+		cout << endl;
+	}
+	
 	calculations(campers, nightsStaying, firesPlanned, fireStarter,
 		lbsMarshmallow);
-	printSave(supply, MAX_ARRAY, name, campers, nightsStaying,
+	printSave(supply, itinerary, hikingSupplies, hasHikingSupplies, MAX_ARRAY, name, campers, nightsStaying,
 		firesPlanned, fireStarter, lbsMarshmallow, ch, raiseFlag);
 
-	//if exceptions are raised in printSave function, exit program with error
 	if (raiseFlag)
 	{
 		return 1;
+	}
+
+	// Save trip as a Log before exit
+	cout << endl << "# Would you like to save this trip as a log? (Y/N) #" << endl;
+	char saveLog;
+	cin >> saveLog;
+	cin.ignore(50, '\n');
+
+	if (saveLog == 'Y' || saveLog == 'y')
+	{
+		string logName;
+		cout << "# Enter a name for this trip log: ";
+		getline(cin, logName);
+
+		Logs tripLog(logName, itinerary, supply);
+		tripLog.saveLog();
+		cout << endl;
 	}
 
 	cout << "# Thanks for allowing me to assist you  #" << endl
@@ -191,8 +365,8 @@ void bannerAndInput(string& name, int& campers, int& nightsStaying, int& firesPl
 		<< "#== and how many campers will be going, #" << endl
 		<< "#=================  including yourself? #" << endl << endl;
 
-	if (!(cin >> campers)) {//initialize campers variable; handle non-numerical entries
-		campers = 1; //invalid entries will set variable equal to 1
+	if (!(cin >> campers)) {
+		campers = 1;
 		cout << "#== The value needs to be an integer! ==#" << endl
 			<< "#==== = = - -  I've set the value to 1 =#" << endl << endl;
 	}
@@ -200,12 +374,11 @@ void bannerAndInput(string& name, int& campers, int& nightsStaying, int& firesPl
 	cout << endl << "# " << campers << " Campers, okay! Now, how many nights #" << endl
 		<< "#======= = - - -   will you be staying? #" << endl << endl;
 
-
-	cin.clear();          //clear and reset istream in fail state
+	cin.clear();
 	cin.ignore(50, '\n');
 
-	if (!(cin >> nightsStaying)) {//initialize nightsStaying variable; handle exceptions
-		nightsStaying = 1; //invalid entries will set variable equal to 1
+	if (!(cin >> nightsStaying)) {
+		nightsStaying = 1;
 		cout << "#== The value needs to be an integer! ==#" << endl
 			<< "#==== = = - -  I've set the value to 1 =#" << endl << endl;
 	}
@@ -213,12 +386,11 @@ void bannerAndInput(string& name, int& campers, int& nightsStaying, int& firesPl
 	cout << endl << "# " << nightsStaying << " Nights, okay! Now, how many fires ==#" << endl
 		<< "#==== - do you plan to have each day? ==#" << endl;
 
-
-	cin.clear();          //clear and reset istream in fail state
+	cin.clear();
 	cin.ignore(50, '\n');
 
-	if (!(cin >> firesPlanned)) {//initialize firesPlanned variable; handle exceptions
-		firesPlanned = 2; //invalid entries will set variable equal to 2
+	if (!(cin >> firesPlanned)) {
+		firesPlanned = 2;
 		cout << "#== The value needs to be an integer! ==#" << endl
 			<< "#==== = = - -  I've set the value to 2  =#" << endl << endl;
 	}
@@ -228,10 +400,10 @@ void bannerAndInput(string& name, int& campers, int& nightsStaying, int& firesPl
 		<< "# like to add to your camping list?  ===#" << endl
 		<< "#==== = = - - - -    Enter Y for yes ===#" << endl << endl;
 
-	cin.clear();          //clear and reset istream in fail state
+	cin.clear();
 	cin.ignore(50, '\n');
 
-	cin >> ch; //get user response for adding an extra item
+	cin >> ch;
 }
 
 void calculations(int campers, int nightsStaying, int firesPlanned, int& fireStarter,
@@ -241,46 +413,43 @@ void calculations(int campers, int nightsStaying, int firesPlanned, int& fireSta
 	calculateMarshmallows(fireStarter, campers, lbsMarshmallow);
 }
 
-int menuSelect()//int menu)
+void printSave(SupplyList& supply, Itin& itinerary, HikingSupplies& hikingSupplies, bool hasHikingSupplies,
+	int length, string name, int campers, int nightsStaying, int firesPlanned, int fireStarter, 
+	double lbsMarshmallow, char ch, bool& raiseFlag)
 {
-	int menu;
-	cout << "#---- How would you like to proceed? ---#" << endl << endl
-		<< "#----  1 = Make/Replace Itinerary   ----#" << endl
-		<< "#----  2 = Save and display on screen  -#" << endl
-		<< "#----  3 = Save to file only   ---------#" << endl << endl;
-	cin >> menu;//get user menu selection
-	return menu;
-}
+	// Use Menu class instead of menuSelect() function
+	Menu tripMenu(name, 3, high);
+	tripMenu.setOption(0, "Make/Replace Itinerary");
+	tripMenu.setOption(1, "Save and display on screen");
+	tripMenu.setOption(2, "Save to file only");
 
-void printSave(SupplyList& supply, int length, string name,
-	int campers, int nightsStaying, int firesPlanned, int fireStarter, double lbsMarshmallow, char ch, bool& raiseFlag)
-
-{
 	int menu;
 	string activity;
 	string extraItem;
-	bool itinerary = false;
+	bool hasItinerary = false;
 	ofstream outData;
 	ifstream inData;
-	//raiseFlag = false;
 
 	do {
-
-		menu = menuSelect();
+		tripMenu.print();
+		menu = tripMenu.getSelection();
 
 		switch (menu) {
 		case 1:
-			itFunc(nightsStaying, activity, itinerary);
+			// Build itinerary using Itin class
+			itinerary.buildItinerary();
+			itinerary.writeToFile(it);  // Write to legacy It.txt
+			itinerary.writeIndexedFile();  // Auto-increments and wraps at 10
+			hasItinerary = true;
 			break;
-
 
 		case 2:
 			cout << "#=====   Printing list to screen   =====#" << endl << endl << endl;
-			if (itinerary) //if itinerary was created, read from 'it' file
+			if (hasItinerary)
 			{
 				inData.open(it);
 
-				if (!inData) // open input file; handle exceptions
+				if (!inData)
 				{
 					raiseFlag = true;
 					cout << "#== Cannot open file, exiting program ==#" << endl << endl;
@@ -288,49 +457,50 @@ void printSave(SupplyList& supply, int length, string name,
 				}
 
 				cout << "#*********************************#" << endl
-					<< right << setw(19) << setfill('.') << name    //
+					<< right << setw(19) << setfill('.') << name
 					<< left << setw(16) << "'s Itinerary" << endl
 					<< right << "#*********************************#" << endl;
 
-
-				while (inData) // read and print itinerary to screen
+				while (inData)
 				{
 					getline(inData, activity);
 					cout << activity << endl;
 				}
 				inData.close();
-
 			}
 			cout << "#*********************************#" << endl;
-			cout << right << setw(19) << setfill('.') << name    //name the camping list
+			cout << right << setw(19) << setfill('.') << name
 				<< left << "'s Camp Supplies" << endl
-				<< showpoint << fixed << setprecision(2) //will only apply to lbsMarshmallow variable
+				<< showpoint << fixed << setprecision(2)
 				<< setw(28) << "Size of camping party:"
-				<< right << setw(7) << campers << endl  //set party size = campers variable
+				<< right << setw(7) << campers << endl
 				<< left << setw(28) << "Duration of stay:"
-				<< right << setw(7) << nightsStaying << endl  //duration of stay = nightsStaying
+				<< right << setw(7) << nightsStaying << endl
 				<< setfill('-') << "#" << setw(34) << "#" << endl
 				<< "#" << setw(34) << "#" << endl
 				<< setfill('.') << "#" << setw(16) << "Things "
 				<< left << setw(17) << "to pack" << "#" << endl
-				<< "Need: " << static_cast<int>((campers / 2.0) + .5)      //want to round up for both 2 man and
-				<< "x 2-man OR " << static_cast<int>((campers / 5.0) + .8) //5 man tents thus adding .5 & .8 to
-				<< "x 5-man tent(s)" << endl								//static_cast<int>
+				<< "Need: " << static_cast<int>((campers / 2.0) + .5)
+				<< "x 2-man OR " << static_cast<int>((campers / 5.0) + .8)
+				<< "x 5-man tent(s)" << endl
 				<< setw(28) << "- - - Sleeping bags"
-				<< right << setw(7) << campers << endl   //set # of sleeping bags = campers variable
+				<< right << setw(7) << campers << endl
 				<< left << setw(28) << "- - - Fire starters"
-				<< right << setw(7) << fireStarter << endl //print # of fire starters to bring
+				<< right << setw(7) << fireStarter << endl
 				<< left << setw(28) << "- - - Lbs of Marshmallow"
-				<< right << setw(7) << lbsMarshmallow << endl; //print weight of marshmallows to bring
+				<< right << setw(7) << lbsMarshmallow << endl;
 			if (ch == 'y' || ch == 'Y')
 			{
-				// use supply instance directly
 				supply.printItems(length);
 				if (raiseFlag)
 				{
 					return;
 				}
-
+			}
+			// Add hiking supplies to screen output
+			if (hasHikingSupplies)
+			{
+				hikingSupplies.printItems(length);
 			}
 			cout << "#" << setfill('-') << setw(34) << "#" << endl
 				<< setfill('.') << setw(26) << "And lots of camping "
@@ -342,12 +512,11 @@ void printSave(SupplyList& supply, int length, string name,
 			outData.open(rpt);
 			cout << "#======    Saving your report now...  ==#" << endl;
 
-			if (itinerary) //if itinerary was created, read from 'it' file
+			if (hasItinerary)
 			{
-
 				inData.open(it);
 
-				if (!inData) //open input file; handle exceptions
+				if (!inData)
 				{
 					raiseFlag = true;
 					cout << "#== Cannot open file, exiting program ==#" << endl << endl;
@@ -355,48 +524,54 @@ void printSave(SupplyList& supply, int length, string name,
 				}
 
 				outData << "#*********************************#" << endl
-					<< setw(19) << setfill('.') << name    //name the itinerary for the output file
+					<< setw(19) << setfill('.') << name
 					<< left << setw(17) << "'s Itinerary" << endl
 					<< right << "#*********************************#" << endl;
 
-				while (inData) // read from itinerary file and write to report file
+				while (inData)
 				{
 					getline(inData, activity);
 					outData << activity << endl;
 				}
 				inData.close();
-
 			}
 			outData << "#*********************************#" << endl;
-			outData << setw(19) << setfill('.') << name    //name the camping list
+			outData << setw(19) << setfill('.') << name
 				<< left << "'s Camp Supplies" << endl
-				<< showpoint << fixed << setprecision(2) //will only apply to lbsMarshmallow variable
+				<< showpoint << fixed << setprecision(2)
 				<< setw(28) << "Size of camping party:"
-				<< right << setw(7) << campers << endl  //set party size = campers variable
+				<< right << setw(7) << campers << endl
 				<< left << setw(28) << "Duration of stay:"
-				<< right << setw(7) << nightsStaying << endl  //duration of stay = nightsStaying
+				<< right << setw(7) << nightsStaying << endl
 				<< setfill('-') << "#" << setw(34) << "#" << endl
 				<< "#" << setw(34) << "#" << endl
 				<< setfill('.') << "#" << setw(16) << "Things "
 				<< left << setw(17) << "to pack" << "#" << endl
-				<< "Need: " << static_cast<int>((campers / 2.0) + .5)      //want to round up for both 2 man and
-				<< "x 2-man OR " << static_cast<int>((campers / 5.0) + .8) //5 man tents thus adding .5 & .8 to
-				<< "x 5-man tent(s)" << endl								//static_cast<int>
+				<< "Need: " << static_cast<int>((campers / 2.0) + .5)
+				<< "x 2-man OR " << static_cast<int>((campers / 5.0) + .8)
+				<< "x 5-man tent(s)" << endl
 				<< setw(28) << "- - - Sleeping bags"
-				<< right << setw(7) << campers << endl   //set # of sleeping bags = campers variable
+				<< right << setw(7) << campers << endl
 				<< left << setw(28) << "- - - Fire starters"
-				<< right << setw(7) << fireStarter << endl //print # of fire starters to bring
+				<< right << setw(7) << fireStarter << endl
 				<< left << setw(28) << "- - - Lbs of Marshmallow"
-				<< right << setw(7) << lbsMarshmallow << endl; //print weight of marshmallows to bring
+				<< right << setw(7) << lbsMarshmallow << endl;
 			if (ch == 'y' || ch == 'Y')
 			{
-				// supply already contains items added earlier
 				supply.addItems(outData, raiseFlag, length);
 				if (raiseFlag)
 				{
 					return;
 				}
-
+			}
+			// Add hiking supplies to file output
+			if (hasHikingSupplies)
+			{
+				outData << endl << "#=== Hiking-Specific Supply List ===#" << endl;
+				outData << "Trail Difficulty: " << hikingSupplies.getDifficultyString() << endl;
+				outData << "Distance: " << fixed << setprecision(1) << hikingSupplies.getDistanceMiles() << " miles" << endl;
+				outData << "Food items: " << hikingSupplies.getFoodCount() << endl;
+				outData << "Gear items: " << hikingSupplies.getGearCount() << endl;
 			}
 			outData << "#" << setfill('-') << setw(34) << "#" << endl
 				<< setfill('.') << setw(26) << "And lots of camping "
@@ -412,38 +587,9 @@ void printSave(SupplyList& supply, int length, string name,
 				<< "# will be generated. Please restart the #" << endl
 				<< "#============     program to try again. #" << endl;
 			raiseFlag = true;
-			return; //exit program with error code if invalid menu selection
+			return;
 		}
 	} while (menu == 1);
-
-}
-
-void itFunc(int nightsStaying, string activity, bool& itinerary)
-{
-	ofstream outData;
-
-	itinerary = true; //set itinerary boolean to true if user wants to create itinerary
-	outData.open(it);
-	cout << endl << "# Let's build an itinerary for the trip #" << endl << endl;
-	cin.clear();
-	cin.ignore(1, '\n');
-	for (int n = 1; n <= nightsStaying; n++) //for loop to get activities for each day
-		//for loop requirement for assignment 4
-	{
-		cout << "#==  What activity do you have planned =#" << endl
-			<< "#================ = - -   for day " << n << "? ===#" << endl
-			<< "# (You can say things like \"Kayaking\", =#" << endl
-			<< "#=========   \"Hiking\", or \"Fishing\"  ===#" << endl;
-		getline(cin, activity);
-		cout << "<(" << activity << ") added to itinerary>" << endl << endl;
-		outData << left << setfill(' ') << "*Day " << right << setw(2) << n
-			<< ": " << right << setw(25) << activity << "*" << endl;
-	}
-	outData.close();
-	cout << "# Perfect! I've created your ===========#" << endl
-		<< "#=============  personalized itinerary. #" << endl;
-	//break;
-
 }
 
 void colorText()

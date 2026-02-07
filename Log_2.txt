@@ -1,0 +1,9 @@
+#*********************************#
+#     Camping Log: poop
+#*********************************#
+
+Nights: 1
+Activities: 1
+
+Food items: 1
+Gear items: 1
