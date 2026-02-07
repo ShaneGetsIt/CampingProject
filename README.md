@@ -11,6 +11,12 @@ save and print to screen, or save only.
 
 The following instructions are in the order you can expect them to be relevant:
 
+The program initially asks if you would like to view previous trip logs, you can reply Y/N.
+If you select yes, then the program shows a list of saved logs. You select logs
+based on the number associated with each log - simply enter the number and the log
+will be displayed on screen. After that (or if you choose to skip) the program proceeds
+as follows:
+
 For your name, the program will receive up to a 25 character string as input.
 The subsequent 3 user inputs ask for an integer value, but will only display
 up to 2 digits - please bear this in mind.
@@ -18,13 +24,22 @@ up to 2 digits - please bear this in mind.
 If you wish to add extra items to the supply list, enter Y or y when prompted.
 You will be asked to enter '1' for food, '2' for gear and '3' when finished.
 The extra items prompt takes string inputs, but will only print out to 21 characters.
-You must enter each additional item one at a time; when you are done entering
+You must enter each additional item one at a time; for both options you must enter a quantity
+as well as the importance of those items (low, medium, high - selected by the number
+associated with each option). when you are done entering
 additional items, enter "3".
 
-Once the user's information has been collected, the menu will be displayed;
+You will be asked if you will be going hiking - if so, you will be asked for the distance
+and difficulty of the trail you plan to hike. The program will automatically generate a
+list of items for your hike.
+
+Once the user's information has been collected, a menu will be displayed;
 User will be asked to either create(an)/replace(the existing) itinerary,
-save the report AND display it on the console or save the file only.
-Simply enter 1,2 or 3. Thanks for reading!
+save the report AND display it on the console or save the file only. If user chooses
+to create an itinerary, they will be prompted to enter a string for the given activity - 
+one per day, based on the input length of stay.
+
+In the menu - simply enter 1,2 or 3. Thanks for reading!
 
 ## Class Diagram
 
