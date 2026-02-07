@@ -18,7 +18,7 @@ jobs:
       - name: Build tests
         shell: cmd
         run: |
-          cl /nologo /EHsc /std:c++14 /DRUN_TESTS CampingAssn1.cpp SupplyList.cpp /Fe:CampingAssn1_tests.exe
+          cl /nologo /EHsc /std:c++14 /DRUN_TESTS CampingAssn1.cpp SupplyList.cpp HikingSupplies.cpp LogSelect.cpp Logs.cpp Menu.cpp Itin.cpp /Fe:CampingAssn1_tests.exe
 
       - name: Run tests
         shell: cmd
