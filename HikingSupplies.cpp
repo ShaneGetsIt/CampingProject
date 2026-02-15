@@ -91,6 +91,11 @@ string HikingSupplies::getDifficultyString() const
 	}
 }
 
+string HikingSupplies::getSupplyType() const
+{
+	return "Hiking Supplies - " + getDifficultyString() + " Trail";
+}
+
 // Override printItems to add hiking-specific information
 void HikingSupplies::printItems(int length)
 {
@@ -154,4 +159,10 @@ void HikingSupplies::print() const
 	cout << "Total Food Items: " << getFoodCount() << endl;
 	cout << "Total Gear Items: " << getGearCount() << endl;
 	cout << "#*********************************#" << endl;
+}
+
+// Destructor
+HikingSupplies::~HikingSupplies()
+{
+	// No additional cleanup needed beyond base class
 }

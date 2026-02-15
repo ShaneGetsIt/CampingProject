@@ -16,6 +16,12 @@ public:
 	HikingSupplies();
 	HikingSupplies(string name, int capacity, priority prio, int difficulty, double distance);
 
+	// Virtual destructor
+	virtual ~HikingSupplies();
+
+	// Override pure virtual function from base class
+	virtual string getSupplyType() const override;
+
 	// Setters
 	void setTrailDifficulty(int difficulty);
 	void setDistanceMiles(double distance);

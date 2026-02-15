@@ -337,3 +337,10 @@ void SupplyList::clearAll()
     gearCount = 0;
 }
 
+// Virtual destructor (ADDED for abstract base class)
+SupplyList::~SupplyList()
+{
+    // No dynamic memory to clean up in base class
+    // Derived classes will handle their own cleanup
+}
+

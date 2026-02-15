@@ -3,12 +3,14 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #endif
 #include "doctest.h"
-#include "SupplyList.h"  // SupplyList class definition
-#include "Itin.h"        // Itin class definition
-#include "HikingSupplies.h"  // HikingSupplies class definition
-#include "Menu.h"        // Menu class definition
-#include "Logs.h"        // Logs class definition
-#include "LogSelect.h"   // LogSelect class definition
+#include "SupplyList.h"
+#include "Itin.h"
+#include "HikingSupplies.h"
+#include "GeneralSupplies.h"
+#include "Menu.h"
+#include "Logs.h"
+#include "LogSelect.h"
+#include "SupplyManager.h"  // ADDED
 
 const string extras = "Extras.txt"; // legacy filenames
 const string it = "It.txt";         // itinerary file
@@ -57,29 +59,29 @@ TEST_CASE("Calculations: Marshmallow weight - normal case") {
 }
 
 TEST_CASE("Calculations: Average food quantity - guard divide by zero") {
-	SupplyList supply;
+	GeneralSupplies supply;  // CHANGED from SupplyList
 	CHECK(supply.getAverageFoodQuantity() == doctest::Approx(0.0));
 }
 
 // B) Enum decision logic - exactly 3 tests (if/switch based on enum)
 TEST_CASE("Enum: Priority to string - low") {
-	SupplyList supply;
+	GeneralSupplies supply;  // CHANGED from SupplyList
 	CHECK(supply.getPriorityString(low) == "Low");
 }
 
 TEST_CASE("Enum: Priority to string - medium") {
-	SupplyList supply;
+	GeneralSupplies supply;  // CHANGED from SupplyList
 	CHECK(supply.getPriorityString(medium) == "Med");
 }
 
 TEST_CASE("Enum: Priority to string - high") {
-	SupplyList supply;
+	GeneralSupplies supply;  // CHANGED from SupplyList
 	CHECK(supply.getPriorityString(high) == "High");
 }
 
 // C) Struct/array processing - exactly 3 tests
 TEST_CASE("Array: Add food items and count") {
-	SupplyList supply;
+	GeneralSupplies supply;  // CHANGED from SupplyList
 	SupplyList::inventoryItem item1 = { "Rice", SupplyList::food, low, 2 };
 	SupplyList::inventoryItem item2 = { "Pasta", SupplyList::food, medium, 3 };
 	
@@ -90,7 +92,7 @@ TEST_CASE("Array: Add food items and count") {
 }
 
 TEST_CASE("Array: Total items - food plus gear") {
-	SupplyList supply;
+	GeneralSupplies supply;  // CHANGED from SupplyList
 	SupplyList::inventoryItem food1 = { "Bread", SupplyList::food, low, 5 };
 	SupplyList::inventoryItem gear1 = { "Rope", SupplyList::gear, medium, 2 };
 	
@@ -101,7 +103,7 @@ TEST_CASE("Array: Total items - food plus gear") {
 }
 
 TEST_CASE("Array: Boundary - reject when full") {
-	SupplyList supply;
+	GeneralSupplies supply;  // CHANGED from SupplyList
 	SupplyList::inventoryItem item = { "Item", SupplyList::food, low, 1 };
 	
 	// Fill to capacity
@@ -115,7 +117,7 @@ TEST_CASE("Array: Boundary - reject when full") {
 
 // D) Class methods - exactly 2 tests
 TEST_CASE("Class: addFoodItem success") {
-	SupplyList supply;
+	GeneralSupplies supply;  // CHANGED from SupplyList
 	SupplyList::inventoryItem item = { "Apples", SupplyList::food, medium, 10 };
 	
 	CHECK(supply.addFoodItem(item) == true);
@@ -123,7 +125,7 @@ TEST_CASE("Class: addFoodItem success") {
 }
 
 TEST_CASE("Class: clearAll resets") {
-	SupplyList supply;
+	GeneralSupplies supply;  // CHANGED from SupplyList
 	SupplyList::inventoryItem item = { "Test", SupplyList::food, low, 1 };
 	
 	supply.addFoodItem(item);
@@ -209,7 +211,7 @@ TEST_CASE("Logs: Composition - contains Itin and SupplyList") {
 	Itin testItin(3, medium);
 	testItin.addActivity("Kayaking", high);
 	
-	SupplyList testSupply("Camp Gear", 10, medium);
+	GeneralSupplies testSupply("Camp Gear", 10, medium);  // CHANGED from SupplyList
 	SupplyList::inventoryItem item = { "Tent", SupplyList::gear, high, 1 };
 	testSupply.addGearItem(item);
 	
@@ -226,15 +228,145 @@ TEST_CASE("Logs: Static counter persists across instances") {
 	int initialCount = Logs::getTotalLogs();
 	
 	Itin itin1(2, low);
-	SupplyList supply1;
+	GeneralSupplies supply1;  // CHANGED from SupplyList
 	Logs log1("Trip1", itin1, supply1);
 	
 	Itin itin2(3, high);
-	SupplyList supply2;
+	GeneralSupplies supply2;  // CHANGED from SupplyList
 	Logs log2("Trip2", itin2, supply2);
 	
 	// Counter should be same for both (static member)
 	CHECK(Logs::getTotalLogs() == initialCount);  // Not incremented unless saveLog() called
+}
+
+// ============= WEEK 05 TESTS - MANAGER CLASS & VIRTUAL FUNCTIONS =============
+
+// I) Manager class tests - dynamic memory management
+TEST_CASE("Manager: Default constructor initializes correctly") {
+	SupplyManager manager;
+	CHECK(manager.getSize() == 0);
+	CHECK(manager.getCapacity() == 5);  // Default capacity
+}
+
+TEST_CASE("Manager: Parameterized constructor sets capacity") {
+	SupplyManager manager(10);
+	CHECK(manager.getSize() == 0);
+	CHECK(manager.getCapacity() == 10);
+}
+
+TEST_CASE("Manager: Add supply increases size") {
+	SupplyManager manager;
+	
+	// Create dynamic objects and add to manager
+	GeneralSupplies* general = new GeneralSupplies("Camp Gear", 10, medium);
+	HikingSupplies* hiking = new HikingSupplies("Trail Gear", 20, high, 2, 5.5);
+	
+	manager.addSupply(general);
+	manager.addSupply(hiking);
+	
+	CHECK(manager.getSize() == 2);
+}
+
+TEST_CASE("Manager: Remove supply decreases size") {
+	SupplyManager manager;
+	
+	manager.addSupply(new GeneralSupplies("Test1", 10, low));
+	manager.addSupply(new GeneralSupplies("Test2", 10, medium));
+	
+	CHECK(manager.getSize() == 2);
+	
+	bool removed = manager.removeSupply(0);
+	CHECK(removed == true);
+	CHECK(manager.getSize() == 1);
+}
+
+TEST_CASE("Manager: Remove invalid index returns false") {
+	SupplyManager manager;
+	manager.addSupply(new GeneralSupplies("Test", 10, low));
+	
+	CHECK(manager.removeSupply(-1) == false);  // Invalid negative index
+	CHECK(manager.removeSupply(5) == false);   // Out of bounds
+	CHECK(manager.getSize() == 1);             // Size unchanged
+}
+
+TEST_CASE("Manager: RemoveAll clears all items") {
+	SupplyManager manager;
+	
+	manager.addSupply(new GeneralSupplies("Test1", 10, low));
+	manager.addSupply(new HikingSupplies("Test2", 20, high, 3, 10.0));
+	manager.addSupply(new GeneralSupplies("Test3", 15, medium));
+	
+	CHECK(manager.getSize() == 3);
+	
+	manager.removeAll();
+	CHECK(manager.getSize() == 0);
+}
+
+TEST_CASE("Manager: GetSupply returns correct pointer") {
+	SupplyManager manager;
+	
+	GeneralSupplies* general = new GeneralSupplies("Camp Gear", 10, medium);
+	manager.addSupply(general);
+	
+	SupplyList* retrieved = manager.getSupply(0);
+	CHECK(retrieved != nullptr);
+	CHECK(retrieved->getListName() == "Camp Gear");
+}
+
+TEST_CASE("Manager: GetSupply with invalid index returns nullptr") {
+	SupplyManager manager;
+	manager.addSupply(new GeneralSupplies("Test", 10, low));
+	
+	CHECK(manager.getSupply(-1) == nullptr);
+	CHECK(manager.getSupply(10) == nullptr);
+}
+
+TEST_CASE("Manager: Auto-resize when capacity reached") {
+	SupplyManager manager(2);  // Start with capacity of 2
+	
+	CHECK(manager.getCapacity() == 2);
+	
+	// Add 3 items - should trigger resize
+	manager.addSupply(new GeneralSupplies("Item1", 10, low));
+	manager.addSupply(new GeneralSupplies("Item2", 10, low));
+	manager.addSupply(new GeneralSupplies("Item3", 10, low));
+	
+	CHECK(manager.getSize() == 3);
+	CHECK(manager.getCapacity() == 4);  // Should have doubled from 2 to 4
+}
+
+// J) Virtual function tests - polymorphism
+TEST_CASE("Virtual: getSupplyType returns correct type for GeneralSupplies") {
+	GeneralSupplies general("Camp Gear", 10, medium);
+	CHECK(general.getSupplyType() == "General Camping Supplies");
+}
+
+TEST_CASE("Virtual: getSupplyType returns correct type for HikingSupplies") {
+	HikingSupplies hiking("Trail Gear", 20, high, 2, 5.5);
+	CHECK(hiking.getSupplyType() == "Hiking Supplies - Moderate Trail");
+}
+
+TEST_CASE("Virtual: Polymorphic call through base pointer") {
+	SupplyList* basePtr = new HikingSupplies("Trail", 20, high, 3, 12.0);
+	
+	// Should call HikingSupplies::getSupplyType() due to virtual function
+	CHECK(basePtr->getSupplyType() == "Hiking Supplies - Difficult Trail");
+	
+	delete basePtr;  // Virtual destructor ensures proper cleanup
+}
+
+TEST_CASE("Virtual: Manager stores different types polymorphically") {
+	SupplyManager manager;
+	
+	manager.addSupply(new GeneralSupplies("General", 10, low));
+	manager.addSupply(new HikingSupplies("Hiking", 20, high, 1, 3.0));
+	
+	// Retrieve and check types through base pointer
+	SupplyList* item0 = manager.getSupply(0);
+	SupplyList* item1 = manager.getSupply(1);
+	
+	CHECK(item0->getSupplyType() == "General Camping Supplies");
+	CHECK(item1->getSupplyType() == "Hiking Supplies - Easy Trail");
 }
 
 // ============= MAIN PROGRAM (only in program mode) =============
@@ -252,7 +384,7 @@ int main()
 	double lbsMarshmallow;
 	int firesPlanned;
 	bool raiseFlag = false;
-	SupplyList supply;
+	GeneralSupplies supply;  // CHANGED from SupplyList
 
 	colorText();
 

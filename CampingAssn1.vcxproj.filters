@@ -36,6 +36,12 @@
     <ClCompile Include="HikingSupplies.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GeneralSupplies.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SupplyManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SupplyList.h">
@@ -57,6 +63,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="HikingSupplies.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneralSupplies.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SupplyManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

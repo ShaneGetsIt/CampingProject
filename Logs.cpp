@@ -15,7 +15,7 @@ Logs::Logs(string name, const Itin& itin, const SupplyList& supply)
 {
 	logName = name;
 	itinerary = itin;
-	supplies = supply;
+	supplies.copyFrom(supply);  // CHANGED: Use copyFrom method
 }
 
 // Setters
@@ -31,7 +31,7 @@ void Logs::setItinerary(const Itin& itin)
 
 void Logs::setSupplies(const SupplyList& supply)
 {
-	supplies = supply;
+	supplies.copyFrom(supply);  // CHANGED: Use copyFrom method
 }
 
 // Getters
@@ -45,7 +45,9 @@ Itin Logs::getItinerary() const
 	return itinerary;
 }
 
-SupplyList Logs::getSupplies() const
+// Return base class reference (slicing is acceptable here since we only need SupplyList interface)
+// important***
+const SupplyList& Logs::getSupplies() const
 {
 	return supplies;
 }

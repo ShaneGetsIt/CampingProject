@@ -35,6 +35,12 @@ public:
     // Parameterized constructor (makes this a proper base class)
     SupplyList(string name, int capacity, priority prio);
 
+    // Virtual destructor (ADDED for abstract base class)
+    virtual ~SupplyList();
+
+    // Pure virtual function (ADDED - makes this class abstract)
+    virtual string getSupplyType() const = 0;
+
     // Collect extras from user (interactive)
     void extrasFunc(char ch, int length);
     // Write extra items to output file
