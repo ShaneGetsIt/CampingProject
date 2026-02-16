@@ -24,6 +24,7 @@ GeneralSupplies::~GeneralSupplies()
     // No additional cleanup needed
 }
 
+
 // Copy from base class (ADDED)
 void GeneralSupplies::copyFrom(const SupplyList& other)
 {
