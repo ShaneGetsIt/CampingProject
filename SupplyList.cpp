@@ -344,3 +344,12 @@ SupplyList::~SupplyList()
     // Derived classes will handle their own cleanup
 }
 
+// WEEK 06 ADDITION: Operator<< overload as non-member friend function
+// Uses polymorphism by calling virtual toStream() method
+ostream& operator<<(ostream& out, const SupplyList& supply)
+{
+    // Call the virtual toStream() method - polymorphic behavior
+    supply.toStream(out);
+    return out;
+}
+

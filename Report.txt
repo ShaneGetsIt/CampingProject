@@ -1,14 +1,32 @@
 #*********************************#
-...................'s Camp Supplies
-Size of camping party:............1
-Duration of stay:.................1
+..............shane's Itinerary.....
+#*********************************#
+*Day  1:                   fishing [Med]*
+*Day  2:                  kayaking [Med]*
+
+#*********************************#
+..............shane's Camp Supplies
+Size of camping party:............2
+Duration of stay:.................2
 #---------------------------------#
 #---------------------------------#
 #.........Things to pack..........#
 Need: 1x 2-man OR 1x 5-man tent(s)
-- - - Sleeping bags...............1
-- - - Fire starters...............1
-- - - Lbs of Marshmallow.......0.25
+- - - Sleeping bags...............2
+- - - Fire starters...............2
+- - - Lbs of Marshmallow.......1.00
+-----------------------------------
+Extra food to pack.........Priority
+1x items........................Med
+-----------------------------------
+Extra gear to pack.........Priority
+3x gearsyah....................High
+
+#=== Hiking-Specific Supply List ===#
+Trail Difficulty: Difficult
+Distance: 8.0 miles
+Food items: 2
+Gear items: 5
 #---------------------------------#
 ......And lots of camping spirit!!!
 #*********************************#

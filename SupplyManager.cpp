@@ -4,47 +4,40 @@
 
 // Default constructor
 SupplyManager::SupplyManager()
+	: items()  // WEEK 06: DynamicArray default constructor (capacity 5)
 {
-	capacity = 5;  // Start with capacity of 5
-	size = 0;
-	items = new SupplyList*[capacity];  // Allocate array of pointers
 }
 
 // Parameterized constructor
 SupplyManager::SupplyManager(int initialCapacity)
+	: items(initialCapacity)  // WEEK 06: DynamicArray parameterized constructor
 {
-	capacity = (initialCapacity > 0) ? initialCapacity : 5;
-	size = 0;
-	items = new SupplyList*[capacity];
 }
 
 // Destructor - CRITICAL for memory management
 SupplyManager::~SupplyManager()
 {
-	// Delete all managed objects
-	for (int i = 0; i < size; i++)
+	// Delete all managed objects (SupplyList pointers)
+	for (int i = 0; i < items.getSize(); i++)
 	{
 		delete items[i];  // Virtual destructor ensures proper cleanup
-		items[i] = nullptr;
+		// No need to set to nullptr - DynamicArray destructor handles array cleanup
 	}
-	
-	// Delete the array itself
-	delete[] items;
-	items = nullptr;
+	// DynamicArray destructor automatically cleans up the array itself
 }
 
 // Copy constructor (deep copy)
 SupplyManager::SupplyManager(const SupplyManager& other)
+	: items(other.items.getCapacity())  // Create with same capacity
 {
-	capacity = other.capacity;
-	size = other.size;
-	items = new SupplyList*[capacity];
-	
-	// Deep copy each item (Note: This is simplified - polymorphic copy is complex)
-	for (int i = 0; i < size; i++)
+	// Note: Polymorphic copy is complex - would need clone() method
+	// For now, we copy pointers (shallow copy of pointers themselves)
+	// In production, each SupplyList would need a clone() virtual method
+	for (int i = 0; i < other.items.getSize(); i++)
 	{
-		// For now, we'll set to nullptr (full polymorphic copy requires clone() method)
-		items[i] = nullptr;
+		// WARNING: This is a shallow copy of pointers
+		// Real implementation would need: items += other.items[i]->clone();
+		items += other.items[i];
 	}
 }
 
@@ -56,15 +49,8 @@ void SupplyManager::addSupply(SupplyList* supply)
 		return;  // Don't add null pointers
 	}
 	
-	// Resize if needed
-	if (size >= capacity)
-	{
-		resize();
-	}
-	
-	// Add the item
-	items[size] = supply;
-	size++;
+	// WEEK 06: Use DynamicArray - automatically resizes if needed
+	items += supply;  // Uses operator+= from DynamicArray
 	
 	cout << "# Added supply: " << supply->getSupplyType() << " #" << endl;
 }
@@ -72,7 +58,7 @@ void SupplyManager::addSupply(SupplyList* supply)
 // Remove supply at index (deletes the object)
 bool SupplyManager::removeSupply(int index)
 {
-	if (index < 0 || index >= size)
+	if (index < 0 || index >= items.getSize())
 	{
 		return false;  // Invalid index
 	}
@@ -80,14 +66,8 @@ bool SupplyManager::removeSupply(int index)
 	// Delete the object at index
 	delete items[index];
 	
-	// Shift remaining items down
-	for (int i = index; i < size - 1; i++)
-	{
-		items[i] = items[i + 1];
-	}
-	
-	size--;
-	items[size] = nullptr;  // Clear the last slot
+	// WEEK 06: Use DynamicArray operator-= to remove and shift
+	items -= index;  // Automatically shifts remaining elements
 	
 	return true;
 }
@@ -95,34 +75,78 @@ bool SupplyManager::removeSupply(int index)
 // Remove all items
 void SupplyManager::removeAll()
 {
-	for (int i = 0; i < size; i++)
+	for (int i = 0; i < items.getSize(); i++)
 	{
 		delete items[i];
-		items[i] = nullptr;
 	}
-	size = 0;
+	items.clear();  // WEEK 06: Clear the DynamicArray
 }
 
 // Get supply at index (does not transfer ownership)
 SupplyList* SupplyManager::getSupply(int index) const
 {
-	if (index < 0 || index >= size)
+	if (index < 0 || index >= items.getSize())
 	{
 		return nullptr;
 	}
-	return items[index];
+	return items[index];  // WEEK 06: Direct access via DynamicArray
 }
 
 // Get current size
 int SupplyManager::getSize() const
 {
-	return size;
+	return items.getSize();  // WEEK 06: Delegate to DynamicArray
 }
 
 // Get capacity
 int SupplyManager::getCapacity() const
 {
-	return capacity;
+	return items.getCapacity();  // WEEK 06: Delegate to DynamicArray
+}
+
+// WEEK 06 ADDITION: Operator[] for array-style access with bounds checking
+SupplyList* SupplyManager::operator[](int index) const
+{
+	// Use 'this' pointer explicitly to demonstrate requirement
+	if (index < 0 || index >= this->items.getSize())
+	{
+		cout << "# SupplyManager: Index " << index << " out of bounds. Returning nullptr. #" << endl;
+		return nullptr;  // Safe return for out of bounds
+	}
+	return this->items[index];
+}
+
+// WEEK 06 ADDITION: Operator+= to add supply
+SupplyManager& SupplyManager::operator+=(SupplyList* supply)
+{
+	if (supply != nullptr)
+	{
+		// Use 'this' pointer explicitly
+		this->items += supply;  // DynamicArray handles resizing
+		cout << "# Operator+=: Added supply: " << supply->getSupplyType() << " #" << endl;
+	}
+	return *this;  // Return reference for chaining
+}
+
+// WEEK 06 ADDITION: Operator-= to remove supply by index
+SupplyManager& SupplyManager::operator-=(int index)
+{
+	// Use 'this' pointer explicitly
+	if (index >= 0 && index < this->items.getSize())
+	{
+		// Delete the object first
+		delete this->items[index];
+		
+		// Remove from array (shifts elements)
+		this->items -= index;
+		
+		cout << "# Operator-=: Removed supply at index " << index << " #" << endl;
+	}
+	else
+	{
+		cout << "# Operator-=: Index " << index << " out of bounds. No removal. #" << endl;
+	}
+	return *this;  // Return reference for chaining
 }
 
 // Print all supplies polymorphically
@@ -131,15 +155,15 @@ void SupplyManager::printAll() const
 	cout << "#*********************************#" << endl;
 	cout << "#     Supply Manager Contents     #" << endl;
 	cout << "#*********************************#" << endl;
-	cout << "Total Supplies: " << size << " / " << capacity << endl << endl;
+	cout << "Total Supplies: " << items.getSize() << " / " << items.getCapacity() << endl << endl;
 	
-	if (size == 0)
+	if (items.getSize() == 0)
 	{
 		cout << "No supplies currently managed." << endl;
 	}
 	else
 	{
-		for (int i = 0; i < size; i++)
+		for (int i = 0; i < items.getSize(); i++)
 		{
 			cout << "[" << i << "] " << items[i]->getSupplyType() << endl;
 			cout << "    Name: " << items[i]->getListName() << endl;
@@ -159,7 +183,7 @@ void SupplyManager::printSummary() const
 	int totalFood = 0;
 	int totalGear = 0;
 	
-	for (int i = 0; i < size; i++)
+	for (int i = 0; i < items.getSize(); i++)
 	{
 		totalFood += items[i]->getFoodCount();
 		totalGear += items[i]->getGearCount();
@@ -168,30 +192,8 @@ void SupplyManager::printSummary() const
 	cout << "#*********************************#" << endl;
 	cout << "#   Supply Manager Summary        #" << endl;
 	cout << "#*********************************#" << endl;
-	cout << "Total Supply Lists: " << size << endl;
+	cout << "Total Supply Lists: " << items.getSize() << endl;
 	cout << "Total Food Items: " << totalFood << endl;
 	cout << "Total Gear Items: " << totalGear << endl;
 	cout << "#*********************************#" << endl;
-}
-
-// Resize array when capacity is reached
-void SupplyManager::resize()
-{
-	int newCapacity = capacity * 2;  // Double the capacity
-	SupplyList** newItems = new SupplyList*[newCapacity];
-	
-	// Copy existing pointers
-	for (int i = 0; i < size; i++)
-	{
-		newItems[i] = items[i];
-	}
-	
-	// Delete old array (but NOT the objects it points to)
-	delete[] items;
-	
-	// Update to new array
-	items = newItems;
-	capacity = newCapacity;
-	
-	cout << "# Manager resized to capacity: " << capacity << " #" << endl;
 }

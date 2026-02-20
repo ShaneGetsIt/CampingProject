@@ -96,6 +96,18 @@ string HikingSupplies::getSupplyType() const
 	return "Hiking Supplies - " + getDifficultyString() + " Trail";
 }
 
+// WEEK 06 ADDITION: Virtual function for polymorphic streaming
+// Called by operator<< in base class
+void HikingSupplies::toStream(ostream& out) const
+{
+	// Use 'this' pointer explicitly to demonstrate requirement
+	out << "HikingSupplies[" << this->getListName()
+		<< ", " << this->getDifficultyString() << " Trail"
+		<< ", " << this->getDistanceMiles() << " miles"
+		<< ", Priority: " << this->getPriorityString(this->getListPriority())
+		<< ", Items: " << this->getTotalItemCount() << "]";
+}
+
 // Override printItems to add hiking-specific information
 void HikingSupplies::printItems(int length)
 {

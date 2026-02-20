@@ -48,3 +48,25 @@ void GeneralSupplies::copyFrom(const SupplyList& other)
         addGearItem(other.getGearItem(i));
     }
 }
+
+// WEEK 06 ADDITION: Operator== overload
+// Two GeneralSupplies objects are equal if their meaningful identity fields match
+// Meaningful identity: listName, maxCapacity, listPriority
+// Implemented as member function since we need access to private members via getters
+bool GeneralSupplies::operator==(const GeneralSupplies& other) const
+{
+    // Compare meaningful identity fields using 'this' pointer explicitly
+    return (this->getListName() == other.getListName() &&
+            this->getMaxCapacity() == other.getMaxCapacity() &&
+            this->getListPriority() == other.getListPriority());
+}
+
+// WEEK 06 ADDITION: Virtual function for polymorphic streaming
+// Called by operator<< in base class
+void GeneralSupplies::toStream(ostream& out) const
+{
+    // Use 'this' pointer explicitly to demonstrate requirement
+    out << "GeneralSupplies[" << this->getListName() 
+        << ", Priority: " << this->getPriorityString(this->getListPriority())
+        << ", Items: " << this->getTotalItemCount() << "]";
+}

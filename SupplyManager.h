@@ -1,19 +1,16 @@
 #pragma once
 
 #include "SupplyList.h"
+#include "DynamicArray.h"
 #include <iostream>
 using namespace std;
 
-// SupplyManager - manages a dynamic array of SupplyList pointers
+// WEEK 06 MODIFIED: SupplyManager now uses DynamicArray template
+// Manages a dynamic array of SupplyList pointers
 class SupplyManager
 {
 private:
-	SupplyList** items;     // Dynamic array of base class pointers
-	int size;               // Current number of items
-	int capacity;           // Maximum capacity
-
-	// Helper function to resize array when full
-	void resize();
+	DynamicArray<SupplyList*> items;  // WEEK 06: Template replaces raw pointer array
 
 public:
 	// Constructors
@@ -35,6 +32,11 @@ public:
 	SupplyList* getSupply(int index) const;       // Get pointer to item at index
 	int getSize() const;                          // Get current size
 	int getCapacity() const;                      // Get capacity
+
+	// WEEK 06 ADDITION: Operator overloads
+	SupplyList* operator[](int index) const;      // Array access with bounds checking
+	SupplyManager& operator+=(SupplyList* supply); // Add supply using operator
+	SupplyManager& operator-=(int index);         // Remove supply by index using operator
 
 	// Polymorphic operations
 	void printAll() const;                        // Print all items using virtual functions

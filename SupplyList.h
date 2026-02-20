@@ -14,6 +14,10 @@ const int MAX_ARRAY = 5;
 // Global priority enum (used across multiple base classes)
 enum priority { low, medium, high };
 
+// Forward declaration for friend function
+class SupplyList;
+ostream& operator<<(ostream& out, const SupplyList& supply);
+
 // SupplyList encapsulates additional food/gear items entered by user
 class SupplyList
 {
@@ -40,6 +44,10 @@ public:
 
     // Pure virtual function (ADDED - makes this class abstract)
     virtual string getSupplyType() const = 0;
+
+    // WEEK 06 ADDITION: Pure virtual function for polymorphic streaming
+    // Derived classes override this to provide custom output format
+    virtual void toStream(ostream& out) const = 0;
 
     // Collect extras from user (interactive)
     void extrasFunc(char ch, int length);
@@ -69,6 +77,10 @@ public:
     void setListName(string name);
     void setMaxCapacity(int capacity);
     void setListPriority(priority prio);
+
+    // WEEK 06 ADDITION: Friend function for operator<<
+    // Uses polymorphism to call derived class toStream()
+    friend ostream& operator<<(ostream& out, const SupplyList& supply);
 
 protected:
     // Base class data members (required by assignment)

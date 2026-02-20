@@ -135,6 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="doctest.h" />
+    <ClInclude Include="DynamicArray.h" />
     <ClInclude Include="GeneralSupplies.h" />
     <ClInclude Include="HikingSupplies.h" />
     <ClInclude Include="Itin.h" />

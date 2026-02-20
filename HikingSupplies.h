@@ -22,6 +22,9 @@ public:
 	// Override pure virtual function from base class
 	virtual string getSupplyType() const override;
 
+	// WEEK 06 ADDITION: Override virtual streaming function for polymorphic operator<<
+	virtual void toStream(ostream& out) const override;
+
 	// Setters
 	void setTrailDifficulty(int difficulty);
 	void setDistanceMiles(double distance);

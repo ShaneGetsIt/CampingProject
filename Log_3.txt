@@ -1,0 +1,9 @@
+#*********************************#
+#     Camping Log: wk6
+#*********************************#
+
+Nights: 2
+Activities: 2
+
+Food items: 1
+Gear items: 1
