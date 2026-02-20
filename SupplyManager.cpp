@@ -92,7 +92,6 @@ SupplyList* SupplyManager::getSupply(int index) const
 	return items[index];  // WEEK 06: Direct access via DynamicArray
 }
 
-
 // Get current size
 int SupplyManager::getSize() const
 {
