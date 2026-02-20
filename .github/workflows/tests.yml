@@ -15,10 +15,10 @@ jobs:
       - name: Set up MSVC
         uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Build tests
+      - name: Build tests (Release with tests enabled)
         shell: cmd
         run: |
-          cl /nologo /EHsc /std:c++14 /D_DEBUG CampingAssn1.cpp SupplyList.cpp HikingSupplies.cpp LogSelect.cpp Logs.cpp Menu.cpp Itin.cpp SupplyManager.cpp GeneralSupplies.cpp /Fe:CampingAssn1_tests.exe
+          cl /nologo /EHsc /std:c++14 /MD /O2 /D_DEBUG CampingAssn1.cpp SupplyList.cpp HikingSupplies.cpp LogSelect.cpp Logs.cpp Menu.cpp Itin.cpp SupplyManager.cpp GeneralSupplies.cpp /Fe:CampingAssn1_tests.exe
 
       - name: Run tests
         shell: cmd
