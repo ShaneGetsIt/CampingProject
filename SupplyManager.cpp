@@ -72,6 +72,8 @@ bool SupplyManager::removeSupply(int index)
 	return true;
 }
 
+
+
 // Remove all items
 void SupplyManager::removeAll()
 {
