@@ -668,8 +668,7 @@ int main(int argc, char** argv)
 {
 	// Check if we should run tests (Debug mode or if --test flag is passed)
 #if defined(_DEBUG) || defined(RUN_TESTS)
-	// In debug mode, run tests
-	return doctest::Context(argc, argv).run();
+    return doctest::Context(argc, argv).run();
 #else
 	// In release mode, check command line for test flag
 	for (int i = 1; i < argc; ++i) {
