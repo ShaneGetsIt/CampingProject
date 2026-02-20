@@ -18,9 +18,19 @@ jobs:
       - name: Build tests
         shell: cmd
         run: |
-          cl /nologo /EHsc /std:c++14 /DRUN_TESTS CampingAssn1.cpp SupplyList.cpp HikingSupplies.cpp LogSelect.cpp Logs.cpp Menu.cpp Itin.cpp SupplyManager.cpp GeneralSupplies.cpp /Fe:CampingAssn1_tests.exe
+          cl /nologo /EHsc /std:c++14 /D_DEBUG CampingAssn1.cpp SupplyList.cpp HikingSupplies.cpp LogSelect.cpp Logs.cpp Menu.cpp Itin.cpp SupplyManager.cpp GeneralSupplies.cpp /Fe:CampingAssn1_tests.exe
 
       - name: Run tests
         shell: cmd
         run: |
           CampingAssn1_tests.exe
+
+      - name: Build release executable
+        shell: cmd
+        run: |
+          cl /nologo /EHsc /std:c++14 /DNDEBUG /O2 CampingAssn1.cpp SupplyList.cpp HikingSupplies.cpp LogSelect.cpp Logs.cpp Menu.cpp Itin.cpp SupplyManager.cpp GeneralSupplies.cpp /Fe:CampingAssn1.exe
+
+      - name: Test release build (help command)
+        shell: cmd
+        run: |
+          echo | CampingAssn1.exe
