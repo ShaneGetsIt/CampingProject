@@ -101,7 +101,7 @@ public:
 		// Bounds checking - throw on invalid index
 		if (index < 0 || index >= size)
 		{
-			throw InvalidIndexException("DynamicArray: index out of range");
+			throw InvalidIndexException("DynamicArray: index out of range");//*****************************************
 		}
 		return data[index];
 	}
@@ -111,7 +111,7 @@ public:
 	{
 		if (index < 0 || index >= size)
 		{
-			throw InvalidIndexException("DynamicArray: index out of range");
+			throw InvalidIndexException("DynamicArray: index out of range");//*****************************************
 		}
 		return data[index];
 	}
@@ -138,9 +138,9 @@ public:
 	{
 		// Validate index - throw on invalid removal
 		if (index < 0 || index >= size)
-		{
-			throw InvalidIndexException("DynamicArray: cannot remove index (invalid index)");
-		}
+		{                                                                                    //*****************************************
+			throw InvalidIndexException("DynamicArray: cannot remove index (invalid index)");//****************************************
+		}																					 //*****************************************
 
 		// Shift elements left to close the gap
 		for (int i = index; i < size - 1; i++)

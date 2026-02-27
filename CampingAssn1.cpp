@@ -467,24 +467,21 @@ TEST_CASE("Operator[]: Valid index returns correct item") {
 	CHECK(retrieved->getListName() == "Second");
 }
 
-TEST_CASE("Operator[]: Invalid index returns nullptr") {
+TEST_CASE("Operator[]: Invalid index throws exception") {
 	SupplyManager manager;
 	manager.addSupply(new GeneralSupplies("Test", 10, low));
 	
-	// Out of bounds access
-	SupplyList* result1 = manager[-1];
-	SupplyList* result2 = manager[10];
-	
-	CHECK(result1 == nullptr);
-	CHECK(result2 == nullptr);
+	// Out of bounds access should throw
+	CHECK_THROWS_AS(manager[-1], InvalidIndexException);
+	CHECK_THROWS_AS(manager[10], InvalidIndexException);
 }
 
-TEST_CASE("Operator[]: Empty manager with invalid index") {
+TEST_CASE("Operator[]: Empty manager throws on any index") {
 	SupplyManager manager;
 	
-	// No items in manager
-	SupplyList* result = manager[0];
-	CHECK(result == nullptr);
+	// No items in manager - any access should throw
+	CHECK_THROWS_AS(manager[0], InvalidIndexException);
+	CHECK_THROWS_AS(manager[-1], InvalidIndexException);
 }
 
 // N) Operator+= / Operator-= tests - at least 2 tests
@@ -659,7 +656,7 @@ TEST_CASE("Template Class: DynamicArray bounds checking") {
 	CHECK(arr[0] == 42);
 	
 	// Invalid access - should throw InvalidIndexException
-	CHECK_THROWS_AS(arr[10], InvalidIndexException);
+	CHECK_THROWS_AS(arr[10], InvalidIndexException);           //****************************
 }
 
 // ============= MAIN PROGRAM =============

@@ -137,6 +137,7 @@
     <ClInclude Include="DebugMemoryCheck.h" />
     <ClInclude Include="doctest.h" />
     <ClInclude Include="DynamicArray.h" />
+    <ClInclude Include="ExceptionsExample.h" />
     <ClInclude Include="GeneralSupplies.h" />
     <ClInclude Include="HikingSupplies.h" />
     <ClInclude Include="InvalidIndexExceptions.h" />

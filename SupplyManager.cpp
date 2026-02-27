@@ -71,7 +71,7 @@ bool SupplyManager::removeSupply(int index)
 	items -= index;  // Automatically shifts remaining elements
 	
 	return true;
-}
+}//just to verify how I will explain whats happening in DynamicArray.h: 
 
 
 
@@ -112,10 +112,9 @@ SupplyList* SupplyManager::operator[](int index) const
 {
 	// Use 'this' pointer explicitly to demonstrate requirement
 	if (index < 0 || index >= this->items.getSize())
-	{
-		cout << "# SupplyManager: Index " << index << " out of bounds. Returning nullptr. #" << endl;
-		return nullptr;  // Safe return for out of bounds
-	}
+	{  //**********************
+		throw InvalidIndexException("SupplyManager: cannot access index (invalid index)");//******
+	}  //***********************
 	return this->items[index];
 }
 
@@ -145,8 +144,8 @@ SupplyManager& SupplyManager::operator-=(int index)
 		
 		cout << "# Operator-=: Removed supply at index " << index << " #" << endl;
 	}
-	else
-	{
+	else//***************************************************************************
+	{   //****************************************************************************
 		// Per assignment requirement: operator-= that removes by index must throw on invalid removal
 		throw InvalidIndexException("SupplyManager: cannot remove index (invalid index)");
 	}
