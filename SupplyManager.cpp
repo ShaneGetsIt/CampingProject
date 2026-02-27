@@ -1,6 +1,7 @@
 #include "SupplyManager.h"
 #include "GeneralSupplies.h"
 #include "HikingSupplies.h"
+#include "InvalidIndexExceptions.h"   // added to throw custom exception
 
 // Default constructor
 SupplyManager::SupplyManager()
@@ -146,7 +147,8 @@ SupplyManager& SupplyManager::operator-=(int index)
 	}
 	else
 	{
-		cout << "# Operator-=: Index " << index << " out of bounds. No removal. #" << endl;
+		// Per assignment requirement: operator-= that removes by index must throw on invalid removal
+		throw InvalidIndexException("SupplyManager: cannot remove index (invalid index)");
 	}
 	return *this;  // Return reference for chaining
 }

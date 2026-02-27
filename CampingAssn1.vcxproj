@@ -134,10 +134,12 @@
     <ClCompile Include="SupplyManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DebugMemoryCheck.h" />
     <ClInclude Include="doctest.h" />
     <ClInclude Include="DynamicArray.h" />
     <ClInclude Include="GeneralSupplies.h" />
     <ClInclude Include="HikingSupplies.h" />
+    <ClInclude Include="InvalidIndexExceptions.h" />
     <ClInclude Include="Itin.h" />
     <ClInclude Include="Logs.h" />
     <ClInclude Include="LogSelect.h" />

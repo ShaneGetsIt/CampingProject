@@ -10,6 +10,7 @@
 #include "LogSelect.h"
 #include "SupplyManager.h"
 #include "DynamicArray.h"  // WEEK 06 ADDITION
+#include "DebugMemoryCheck.h" // Added: CRT memory leak checker (Debug-only)
 
 const string extras = "Extras.txt"; // legacy filenames
 const string it = "It.txt";         // itinerary file
@@ -532,8 +533,9 @@ TEST_CASE("Operator-=: Invalid index does not affect size") {
 	manager += new GeneralSupplies("Test", 10, low);
 	
 	int initialSize = manager.getSize();
-	manager -= 10;  // Invalid index
-	
+	// operator-= must throw on invalid removal
+	CHECK_THROWS_AS(manager -= 10, InvalidIndexException);
+	// size should remain unchanged after failed removal
 	CHECK(manager.getSize() == initialSize);
 }
 
@@ -656,16 +658,18 @@ TEST_CASE("Template Class: DynamicArray bounds checking") {
 	// Valid access
 	CHECK(arr[0] == 42);
 	
-	// Invalid access - should return safe fallback (index 0) and print warning
-	// Note: This will print a warning to console, which is expected behavior
-	int result = arr[10];
-	CHECK(result == 42);  // Returns first element as fallback
+	// Invalid access - should throw InvalidIndexException
+	CHECK_THROWS_AS(arr[10], InvalidIndexException);
 }
 
 // ============= MAIN PROGRAM =============
 
 int main(int argc, char** argv)
 {
+	// Instantiate DebugMemoryCheck immediately so it snapshots before any test or program activity.
+	// In Debug builds this will report leaks at program exit; in Release it's a no-op.
+	DebugMemoryCheck dbgMemCheck;
+
 	// Check if we should run tests (Debug mode or if --test flag is passed)
 #if defined(_DEBUG) || defined(RUN_TESTS)
     return doctest::Context(argc, argv).run();
@@ -907,7 +911,7 @@ void printSave(SupplyList& supply, Itin& itinerary, HikingSupplies& hikingSuppli
 			cout << right << setw(19) << setfill('.') << name
 				<< left << "'s Camp Supplies" << endl
 				<< showpoint << fixed << setprecision(2)
-				<< setw(28) << "Size of camping party:"
+				<< setw(28) << "Size of camping party:" 
 				<< right << setw(7) << campers << endl
 				<< left << setw(28) << "Duration of stay:"
 				<< right << setw(7) << nightsStaying << endl

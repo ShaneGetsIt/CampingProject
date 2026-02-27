@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include <string>
+#include "InvalidIndexExceptions.h"
 using namespace std;
 
 // WEEK 06 ADDITION: Template class for dynamic array container
@@ -96,11 +98,10 @@ public:
 	// Returns reference for read/write access
 	T& operator[](int index)
 	{
-		// Bounds checking - return first element if out of range (safe fallback)
+		// Bounds checking - throw on invalid index
 		if (index < 0 || index >= size)
 		{
-			cout << "# Warning: Index " << index << " out of bounds (size=" << size << "). Returning index 0. #" << endl;
-			return data[0];  // Safe fallback (assumes size > 0)
+			throw InvalidIndexException("DynamicArray: index out of range");
 		}
 		return data[index];
 	}
@@ -110,8 +111,7 @@ public:
 	{
 		if (index < 0 || index >= size)
 		{
-			cout << "# Warning: Index " << index << " out of bounds (size=" << size << "). Returning index 0. #" << endl;
-			return data[0];
+			throw InvalidIndexException("DynamicArray: index out of range");
 		}
 		return data[index];
 	}
@@ -136,11 +136,10 @@ public:
 	// Removes element at index and shifts remaining elements left
 	DynamicArray& operator-=(int index)
 	{
-		// Validate index
+		// Validate index - throw on invalid removal
 		if (index < 0 || index >= size)
 		{
-			cout << "# Warning: Cannot remove index " << index << " (out of bounds). #" << endl;
-			return *this;
+			throw InvalidIndexException("DynamicArray: cannot remove index (invalid index)");
 		}
 
 		// Shift elements left to close the gap
