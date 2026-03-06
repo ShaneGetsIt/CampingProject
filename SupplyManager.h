@@ -12,6 +12,9 @@ class SupplyManager
 private:
 	DynamicArray<SupplyList*> items;  // WEEK 06: Template replaces raw pointer array
 
+	// Recursive helper (prints from index to end)
+	void printAllRecursiveImpl(int index) const;
+
 public:
 	// Constructors
 	SupplyManager();
@@ -27,6 +30,9 @@ public:
 	void addSupply(SupplyList* supply);           // Add item (takes ownership)
 	bool removeSupply(int index);                 // Remove and delete item at index
 	void removeAll();                             // Remove and delete all items
+
+	// Minimal recursive member required by assignment
+	void printAllRecursive() const;               // public wrapper to demonstrate recursion
 
 	// Access
 	SupplyList* getSupply(int index) const;       // Get pointer to item at index

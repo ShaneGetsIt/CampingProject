@@ -49,10 +49,10 @@ void SupplyManager::addSupply(SupplyList* supply)
 	{
 		return;  // Don't add null pointers
 	}
-	
+
 	// WEEK 06: Use DynamicArray - automatically resizes if needed
 	items += supply;  // Uses operator+= from DynamicArray
-	
+
 	cout << "# Added supply: " << supply->getSupplyType() << " #" << endl;
 }
 
@@ -63,15 +63,15 @@ bool SupplyManager::removeSupply(int index)
 	{
 		return false;  // Invalid index
 	}
-	
+
 	// Delete the object at index
 	delete items[index];
-	
+
 	// WEEK 06: Use DynamicArray operator-= to remove and shift
 	items -= index;  // Automatically shifts remaining elements
-	
+
 	return true;
-}//just to verify how I will explain whats happening in DynamicArray.h: 
+}
 
 
 
@@ -112,9 +112,9 @@ SupplyList* SupplyManager::operator[](int index) const
 {
 	// Use 'this' pointer explicitly to demonstrate requirement
 	if (index < 0 || index >= this->items.getSize())
-	{  //**********************
-		throw InvalidIndexException("SupplyManager: cannot access index (invalid index)");//******
-	}  //***********************
+	{
+		throw InvalidIndexException("SupplyManager: cannot access index (invalid index)");
+	}
 	return this->items[index];
 }
 
@@ -138,28 +138,67 @@ SupplyManager& SupplyManager::operator-=(int index)
 	{
 		// Delete the object first
 		delete this->items[index];
-		
+
 		// Remove from array (shifts elements)
 		this->items -= index;
-		
+
 		cout << "# Operator-=: Removed supply at index " << index << " #" << endl;
 	}
-	else//***************************************************************************
-	{   //****************************************************************************
+	else
+	{
 		// Per assignment requirement: operator-= that removes by index must throw on invalid removal
 		throw InvalidIndexException("SupplyManager: cannot remove index (invalid index)");
 	}
 	return *this;  // Return reference for chaining
 }
 
-// Print all supplies polymorphically
+// Recursive helper: print items starting at index
+void SupplyManager::printAllRecursiveImpl(int index) const
+{
+	// base case
+	if (index >= items.getSize()) return;
+
+	SupplyList* curr = items[index];
+	if (curr != nullptr)
+	{
+		cout << "[" << index << "] " << curr->getSupplyType() << endl;
+		cout << "    Name: " << curr->getListName() << endl;
+		cout << "    Priority: " << curr->getPriorityString(curr->getListPriority()) << endl;
+		cout << "    Food Items: " << curr->getFoodCount() << endl;
+		cout << "    Gear Items: " << curr->getGearCount() << endl;
+		cout << endl;
+	}
+	else
+	{
+		cout << "[" << index << "] " << "<null>" << endl << endl;
+	}
+
+	// recursive step
+	printAllRecursiveImpl(index + 1);
+}
+
+// Public wrapper for recursion
+void SupplyManager::printAllRecursive() const
+{
+	cout << "#*********************************#" << endl;
+	cout << "#     Supply Manager (Recursive)  #" << endl;
+	cout << "#*********************************#" << endl;
+	cout << "Total Supplies: " << items.getSize() << " / " << items.getCapacity() << endl << endl;
+
+	// start recursion at 0
+	printAllRecursiveImpl(0);
+
+	cout << "#*********************************#" << endl;
+}
+
+// Print all supplies polymorphically (original iterative implementation)
 void SupplyManager::printAll() const
 {
 	cout << "#*********************************#" << endl;
 	cout << "#     Supply Manager Contents     #" << endl;
 	cout << "#*********************************#" << endl;
 	cout << "Total Supplies: " << items.getSize() << " / " << items.getCapacity() << endl << endl;
-	
+
 	if (items.getSize() == 0)
 	{
 		cout << "No supplies currently managed." << endl;
@@ -176,7 +215,7 @@ void SupplyManager::printAll() const
 			cout << endl;
 		}
 	}
-	
+
 	cout << "#*********************************#" << endl;
 }
 
@@ -185,13 +224,13 @@ void SupplyManager::printSummary() const
 {
 	int totalFood = 0;
 	int totalGear = 0;
-	
+
 	for (int i = 0; i < items.getSize(); i++)
 	{
 		totalFood += items[i]->getFoodCount();
 		totalGear += items[i]->getGearCount();
 	}
-	
+
 	cout << "#*********************************#" << endl;
 	cout << "#   Supply Manager Summary        #" << endl;
 	cout << "#*********************************#" << endl;

@@ -548,6 +548,16 @@ TEST_CASE("Operator-=: Remove all items one by one") {
 	CHECK(manager.getSize() == 0);
 }
 
+TEST_CASE("Manager: printAllRecursive does not throw and preserves size") {
+	SupplyManager manager;
+	manager += new GeneralSupplies("First", 10, low);
+	manager += new HikingSupplies("Trail Gear", 12, medium, 2, 5.0);
+
+	CHECK(manager.getSize() == 2);
+	CHECK_NOTHROW(manager.printAllRecursive()); // exercise the recursive member
+	CHECK(manager.getSize() == 2);               // ensure printing didn't modify contents
+}
+
 // ============= WEEK 06 TESTS - TEMPLATE USAGE =============
 
 // O) Function template tests - at least 2 tests
