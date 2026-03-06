@@ -537,6 +537,7 @@ TEST_CASE("Operator-=: Invalid index does not affect size") {
 }
 
 
+
 TEST_CASE("Operator-=: Remove all items one by one") {
 	SupplyManager manager;
 	manager += new GeneralSupplies("First", 10, low);
