@@ -2,14 +2,16 @@
 
 // Default constructor
 SupplyList::SupplyList()
-    : listName("General Supplies"), maxCapacity(MAX_ARRAY), listPriority(medium), foodCount(0), gearCount(0)
+    : listName("General Supplies"), maxCapacity(MAX_ARRAY), listPriority(medium)
 {
+    // vectors default-construct empty
 }
 
 // Parameterized constructor
 SupplyList::SupplyList(string name, int capacity, priority prio)
-    : listName(name), maxCapacity(capacity), listPriority(prio), foodCount(0), gearCount(0)
+    : listName(name), maxCapacity(capacity), listPriority(prio)
 {
+    // vectors default-construct empty
 }
 
 // Getters for base class data
@@ -51,9 +53,9 @@ void SupplyList::extrasFunc(char ch, int length)
 
     if (ch == 'y' || ch == 'Y') {
 
-        cin.ignore(1, '/n');
-        cout << "# You may add up to 5 food items and/or #" << endl
-            << "#===== - - - -            5 gear items =#" << endl << endl;
+        cin.ignore(1, '\n');
+        cout << "# You may add up to " << length << " food items and/or #" << endl
+            << "#===== - - - -            " << length << " gear items =#" << endl << endl;
 
         while (true)
         {
@@ -72,18 +74,19 @@ void SupplyList::extrasFunc(char ch, int length)
             switch (static_cast<itemType>(choice - 1))
             {
             case food:
-
+            {
                 // Add food entry if room
-                if (foodCount < length)
+                if (static_cast<int>(foodList.size()) < length)
                 {
-                    foodList[foodCount].item = food;
+                    inventoryItem temp;
+                    temp.item = food;
 
                     cin.ignore(50, '\n');
                     cout << "#= Enter food item name to add to list =#" << endl << endl;
-                    getline(cin, foodList[foodCount].itemName);
-                    cout << "# Units of " << left << setfill('.') << setw(30) << foodList[foodCount].itemName
+                    getline(cin, temp.itemName);
+                    cout << "# Units of " << left << setfill('.') << setw(30) << temp.itemName
                         + " to bring " << "#" << endl;
-                    cin >> foodList[foodCount].quantity;
+                    cin >> temp.quantity;
                     cout << "# How important is this item on a scale #" << endl
                         << "#= of 1 (low), 2 (medium), or 3 (high)? #" << endl << endl;
                     cin >> choice;
@@ -94,27 +97,28 @@ void SupplyList::extrasFunc(char ch, int length)
                         cin.ignore(12, '\n');
                         cin >> choice;
                     }
-                    foodList[foodCount].prio = static_cast<priority>(choice - 1);
-                    foodCount++;
-
+                    temp.prio = static_cast<priority>(choice - 1);
+                    foodList.push_back(temp);
                 }
                 else
                     cout << " Limit for additional food items reached" << endl << endl;
                 break;
+            }
 
             case gear:
-
+            {
                 // Add gear entry if room
-                if (gearCount < length)
+                if (static_cast<int>(gearList.size()) < length)
                 {
-                    gearList[gearCount].item = gear;
+                    inventoryItem temp;
+                    temp.item = gear;
                     cin.ignore(50, '\n');
                     cout << "#= Enter gear item name to add to list =#" << endl
                         << "# for example: kayak, fishing rod, etc. #" << endl << endl;
-                    getline(cin, gearList[gearCount].itemName);
-                    cout << "# Units of " << left << setfill('.') << setw(30) << gearList[gearCount].itemName
+                    getline(cin, temp.itemName);
+                    cout << "# Units of " << left << setfill('.') << setw(30) << temp.itemName
                         + " to bring " << "#" << endl;
-                    cin >> gearList[gearCount].quantity;
+                    cin >> temp.quantity;
                     cout << "# How important is this item on a scale #" << endl
                         << "#= of 1 (low), 2 (medium), or 3 (high)? #" << endl << endl;
                     cin >> choice;
@@ -125,12 +129,13 @@ void SupplyList::extrasFunc(char ch, int length)
                         cin.ignore(12, '\n');
                         cin >> choice;
                     }
-                    gearList[gearCount].prio = static_cast<priority>(choice - 1);
-                    gearCount++;
+                    temp.prio = static_cast<priority>(choice - 1);
+                    gearList.push_back(temp);
                 }
                 else
                     cout << " Limit for additional gear items reached" << endl << endl;
                 break;
+            }
 
             default:
                 cout << "#== Finished adding additional items  ==#" << endl << endl;
@@ -145,8 +150,6 @@ void SupplyList::extrasFunc(char ch, int length)
 // Write stored extra items to the provided output stream
 void SupplyList::addItems(ofstream& outData, bool& raiseFlag, int length)
 {
-    int i;
-
     if (!outData)
     {
         cout << "#=====   Output file is not open   =====#" << endl << endl;
@@ -154,46 +157,48 @@ void SupplyList::addItems(ofstream& outData, bool& raiseFlag, int length)
         return;
     }
 
-    if (foodCount != 0)
+    if (!foodList.empty())
     {
         outData << right << setw(35) << setfill('-') << "-" << endl
             << setw(27) << setfill('.') << left << "Extra food to pack" << "Priority" << endl;
 
-        for (i = 0; i < foodCount; i++)
+        for (size_t i = 0; i < foodList.size(); ++i)
         {
-            outData << left << foodList[i].quantity << setw(30) << "x " + foodList[i].itemName;
-            if (foodList[i].prio == 0)
+            const inventoryItem& it = foodList[i];
+            outData << left << it.quantity << setw(30) << "x " + it.itemName;
+            if (it.prio == 0)
             {
                 outData << right << setw(4) << "Low" << endl;
             }
-            else if (foodList[i].prio == 1)
+            else if (it.prio == 1)
             {
                 outData << right << setw(4) << "Med" << endl;
             }
-            else if (foodList[i].prio == 2)
+            else if (it.prio == 2)
             {
                 outData << right << setw(4) << "High" << endl;
             }
         }
     }
 
-    if (gearCount != 0)
+    if (!gearList.empty())
     {
         outData << right << setw(35) << setfill('-') << "-" << endl
             << setw(27) << setfill('.') << left << "Extra gear to pack" << "Priority" << endl;
 
-        for (i = 0; i < gearCount; i++)
+        for (size_t i = 0; i < gearList.size(); ++i)
         {
-            outData << left << gearList[i].quantity << setw(30) << "x " + gearList[i].itemName;
-            if (gearList[i].prio == 0)
+            const inventoryItem& it = gearList[i];
+            outData << left << it.quantity << setw(30) << "x " + it.itemName;
+            if (it.prio == 0)
             {
                 outData << right << setw(4) << "Low" << endl;
             }
-            else if (gearList[i].prio == 1)
+            else if (it.prio == 1)
             {
                 outData << right << setw(4) << "Med" << endl;
             }
-            else if (gearList[i].prio == 2)
+            else if (it.prio == 2)
             {
                 outData << right << setw(4) << "High" << endl;
             }
@@ -204,48 +209,48 @@ void SupplyList::addItems(ofstream& outData, bool& raiseFlag, int length)
 // Print stored extra items to console
 void SupplyList::printItems(int length)
 {
-    int i;
-
-    if (foodCount != 0)
+    if (!foodList.empty())
     {
         cout << right << setw(35) << setfill('-') << "-" << endl
             << setw(27) << setfill('.') << left << "Extra food to pack" << "Priority" << endl;
 
-        for (i = 0; i < foodCount; i++)
+        for (size_t i = 0; i < foodList.size(); ++i)
         {
-            cout << left << foodList[i].quantity << setw(30) << "x " + foodList[i].itemName;
-            if (foodList[i].prio == 0)
+            const inventoryItem& it = foodList[i];
+            cout << left << it.quantity << setw(30) << "x " + it.itemName;
+            if (it.prio == 0)
             {
                 cout << right << setw(4) << "Low" << endl;
             }
-            else if (foodList[i].prio == 1)
+            else if (it.prio == 1)
             {
                 cout << right << setw(4) << "Med" << endl;
             }
-            else if (foodList[i].prio == 2)
+            else if (it.prio == 2)
             {
                 cout << right << setw(4) << "High" << endl;
             }
         }
     }
 
-    if (gearCount != 0)
+    if (!gearList.empty())
     {
         cout << right << setw(35) << setfill('-') << "-" << endl
             << setw(27) << setfill('.') << left << "Extra gear to pack" << "Priority" << endl;
 
-        for (i = 0; i < gearCount; i++)
+        for (size_t i = 0; i < gearList.size(); ++i)
         {
-            cout << left << gearList[i].quantity << setw(30) << "x " + gearList[i].itemName;
-            if (gearList[i].prio == 0)
+            const inventoryItem& it = gearList[i];
+            cout << left << it.quantity << setw(30) << "x " + it.itemName;
+            if (it.prio == 0)
             {
                 cout << right << setw(4) << "Low" << endl;
             }
-            else if (gearList[i].prio == 1)
+            else if (it.prio == 1)
             {
                 cout << right << setw(4) << "Med" << endl;
             }
-            else if (gearList[i].prio == 2)
+            else if (it.prio == 2)
             {
                 cout << right << setw(4) << "High" << endl;
             }
@@ -258,48 +263,48 @@ void SupplyList::printItems(int length)
 // Add food item without user interaction; returns false if list is full
 bool SupplyList::addFoodItem(const inventoryItem& item)
 {
-    if (foodCount >= MAX_ARRAY) return false;
-    foodList[foodCount++] = item;
+    if (static_cast<int>(foodList.size()) >= MAX_ARRAY) return false;
+    foodList.push_back(item);
     return true;
 }
 
 // Add gear item without user interaction; returns false if list is full
 bool SupplyList::addGearItem(const inventoryItem& item)
 {
-    if (gearCount >= MAX_ARRAY) return false;
-    gearList[gearCount++] = item;
+    if (static_cast<int>(gearList.size()) >= MAX_ARRAY) return false;
+    gearList.push_back(item);
     return true;
 }
 
 // Get current food count
 int SupplyList::getFoodCount() const
 {
-    return foodCount;
+    return static_cast<int>(foodList.size());
 }
 
 // Get current gear count
 int SupplyList::getGearCount() const
 {
-    return gearCount;
+    return static_cast<int>(gearList.size());
 }
 
 // Get total item count (food + gear)
 int SupplyList::getTotalItemCount() const
 {
-    return foodCount + gearCount;
+    return getFoodCount() + getGearCount();
 }
 
 // Calculate average food quantity (guards against divide by zero)
 double SupplyList::getAverageFoodQuantity() const
 {
-    if (foodCount == 0) return 0.0;
-    
+    if (foodList.empty()) return 0.0;
+
     int total = 0;
-    for (int i = 0; i < foodCount; i++)
+    for (size_t i = 0; i < foodList.size(); ++i)
     {
         total += foodList[i].quantity;
     }
-    return static_cast<double>(total) / foodCount;
+    return static_cast<double>(total) / static_cast<double>(foodList.size());
 }
 
 // Convert priority enum to string using switch
@@ -321,20 +326,86 @@ string SupplyList::getPriorityString(priority prio) const
 // Get food item at index (for testing)
 const SupplyList::inventoryItem& SupplyList::getFoodItem(int index) const
 {
-    return foodList[index];
+    return foodList.at(index);
 }
 
 // Get gear item at index (for testing)
 const SupplyList::inventoryItem& SupplyList::getGearItem(int index) const
 {
-    return gearList[index];
+    return gearList.at(index);
 }
 
 // Clear all items (for testing)
 void SupplyList::clearAll()
 {
-    foodCount = 0;
-    gearCount = 0;
+    foodList.clear();
+    gearList.clear();
+}
+
+// Sequential (linear) search on foodList - returns index or -1 if not found
+int SupplyList::sequentialSearchFood(const string& name) const
+
+{        //using size_t for loop index to avoid signed/unsigned mismatch with vector size
+
+
+    for (size_t i = 0; i < foodList.size(); ++i)
+    {
+        if (foodList[i].itemName == name)
+        {
+            return static_cast<int>(i);
+        }
+    }
+    return -1;
+}
+
+// Insertion sort (by itemName) for foodList
+void SupplyList::insertionSortFoodByName()
+{
+    // Classic insertion sort operating on vector<inventoryItem>
+    for (size_t i = 1; i < foodList.size(); ++i)
+    {
+        inventoryItem key = foodList[i];
+        int j = static_cast<int>(i) - 1;
+
+        // Compare by itemName
+        while (j >= 0 && foodList[static_cast<size_t>(j)].itemName > key.itemName)
+        {
+            foodList[static_cast<size_t>(j + 1)] = foodList[static_cast<size_t>(j)];
+            --j;
+        }
+        foodList[static_cast<size_t>(j + 1)] = key;
+    }
+}
+
+// Binary search on foodList by itemName - requires sorted foodList (ascending)
+// Classic low/mid/high implementation
+int SupplyList::binarySearchFoodByName(const string& name) const
+{
+    if (foodList.empty()) return -1;
+
+    int low = 0;
+    int high = static_cast<int>(foodList.size()) - 1;
+
+    while (low <= high)
+    {
+		int mid = low + (high - low) / 2; // Avoids potential overflow
+        const string& midName = foodList[static_cast<size_t>(mid)].itemName;
+
+        if (midName == name)
+        {
+            return mid;
+        }
+        else if (midName < name)
+        {
+            low = mid + 1;
+        }
+        else
+        {
+            high = mid - 1;
+        }
+    }
+
+    return -1; // not found
 }
 
 // Virtual destructor (ADDED for abstract base class)
@@ -352,4 +423,3 @@ ostream& operator<<(ostream& out, const SupplyList& supply)
     supply.toStream(out);
     return out;
 }
-
