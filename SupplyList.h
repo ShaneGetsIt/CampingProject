@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <string>
 #include <windows.h>
+#include <vector>
 
 using namespace std;
 
@@ -24,7 +25,7 @@ class SupplyList
 public:
     // Nested types (moved inside class)
     enum itemType { food, gear };
-    
+
     struct inventoryItem
     {
         string itemName;
@@ -35,7 +36,7 @@ public:
 
     // Default constructor
     SupplyList();
-    
+
     // Parameterized constructor (makes this a proper base class)
     SupplyList(string name, int capacity, priority prio);
 
@@ -67,12 +68,23 @@ public:
     const inventoryItem& getFoodItem(int index) const;
     const inventoryItem& getGearItem(int index) const;
     void clearAll();
-    
+
+    // Week 09 additions: vector search & sort operations (food list)
+    // Sequential (linear) search on foodList - returns index or -1 if not found
+    int sequentialSearchFood(const string& name) const;
+
+    // Insertion sort (sort foodList in-place by itemName, ascending)
+    void insertionSortFoodByName();
+
+    // Binary search on foodList by itemName - requires foodList to be sorted first
+    // Returns index of found element or -1 if not found
+    int binarySearchFoodByName(const string& name) const;
+
     // Getters for base class data
     string getListName() const;
     int getMaxCapacity() const;
     priority getListPriority() const;
-    
+
     // Setters for base class data
     void setListName(string name);
     void setMaxCapacity(int capacity);
@@ -89,8 +101,7 @@ protected:
     priority listPriority;     // Overall priority of this supply category
 
 private:
-    inventoryItem foodList[MAX_ARRAY]; // stored extra food items
-    inventoryItem gearList[MAX_ARRAY]; // stored extra gear items
-    int foodCount = 0;                 // number of food entries
-    int gearCount = 0;                 // number of gear entries
+    // Replaced fixed-size C arrays with std::vector for dynamic management
+    std::vector<inventoryItem> foodList; // stored extra food items
+    std::vector<inventoryItem> gearList; // stored extra gear items
 };

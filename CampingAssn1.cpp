@@ -671,8 +671,87 @@ TEST_CASE("Template Class: DynamicArray bounds checking") {
 	CHECK_THROWS_AS(arr[10], InvalidIndexException);           //****************************
 }
 
-// ============= MAIN PROGRAM =============
+// ============= WEEK 09 TESTS - VECTOR SEARCH & SORT =============
 
+TEST_CASE("Search: Sequential - found and not found") {
+	GeneralSupplies supply;
+	SupplyList::inventoryItem i1 = { "Apple", SupplyList::food, low, 1 };
+	SupplyList::inventoryItem i2 = { "Bread", SupplyList::food, medium, 2 };
+	SupplyList::inventoryItem i3 = { "Carrot", SupplyList::food, high, 3 };
+
+	CHECK(supply.addFoodItem(i1) == true);
+	CHECK(supply.addFoodItem(i2) == true);
+	CHECK(supply.addFoodItem(i3) == true);
+
+	// Found cases
+	CHECK(supply.sequentialSearchFood("Apple") == 0);
+	CHECK(supply.sequentialSearchFood("Bread") == 1);
+	CHECK(supply.sequentialSearchFood("Carrot") == 2);
+
+	// Not found
+	CHECK(supply.sequentialSearchFood("Zucchini") == -1);
+}
+
+TEST_CASE("Sort and Binary Search: insertion sort then binary search") {
+	GeneralSupplies supply;
+	SupplyList::inventoryItem a = { "Water", SupplyList::food, low, 1 };
+	SupplyList::inventoryItem b = { "Apple", SupplyList::food, low, 1 };
+	SupplyList::inventoryItem c = { "Banana", SupplyList::food, low, 1 };
+
+	CHECK(supply.addFoodItem(a) == true);
+	CHECK(supply.addFoodItem(b) == true);
+	CHECK(supply.addFoodItem(c) == true);
+
+	// Confirm initial (unsorted) order
+	CHECK(supply.getFoodItem(0).itemName == "Water");
+
+	// Sort and verify order
+	supply.insertionSortFoodByName();
+	CHECK(supply.getFoodItem(0).itemName == "Apple");
+	CHECK(supply.getFoodItem(1).itemName == "Banana");
+	CHECK(supply.getFoodItem(2).itemName == "Water");
+
+	// Binary search finds items (requires sorted list)
+	int idx = supply.binarySearchFoodByName("Banana");
+	CHECK(idx != -1);
+	CHECK(supply.getFoodItem(idx).itemName == "Banana");
+
+	// Not found case for binary search
+	CHECK(supply.binarySearchFoodByName("Z") == -1);
+}
+
+TEST_CASE("Edge: empty lists search behavior") {
+	GeneralSupplies supply;
+
+	// Empty list should return -1 for both searches
+	CHECK(supply.sequentialSearchFood("Anything") == -1);
+	CHECK(supply.binarySearchFoodByName("Anything") == -1);
+}
+
+TEST_CASE("Duplicates: sequential returns first occurrence; sort is stable") {
+	GeneralSupplies supply;
+	SupplyList::inventoryItem x = { "Grape", SupplyList::food, low, 1 };
+	SupplyList::inventoryItem y = { "Grape", SupplyList::food, low, 2 };
+
+	CHECK(supply.addFoodItem(x) == true);
+	CHECK(supply.addFoodItem(y) == true);
+
+	// Sequential search returns first occurrence
+	CHECK(supply.sequentialSearchFood("Grape") == 0);
+
+	// Sort should preserve relative order for equal keys (stable)
+	supply.insertionSortFoodByName();
+	CHECK(supply.getFoodItem(0).itemName == "Grape");
+	CHECK(supply.getFoodItem(1).itemName == "Grape");
+	CHECK(supply.getFoodItem(0).quantity == 1); // first entry remained first
+
+	// Binary search finds a matching index
+	int idx = supply.binarySearchFoodByName("Grape");
+	CHECK(idx != -1);
+	CHECK(supply.getFoodItem(idx).itemName == "Grape");
+}
+
+// ============= MAIN PROGRAM =============
 int main(int argc, char** argv)
 {
 	// Instantiate DebugMemoryCheck immediately so it snapshots before any test or program activity.
@@ -806,6 +885,8 @@ void bannerAndInput(string& name, int& campers, int& nightsStaying, int& firesPl
 		<< "#  help plan your trip - to begin, what #" << endl
 		<< "#======================= is your name ? #" << endl << endl;
 
+	cin.clear();
+	cin.ignore(50, '\n'); // ensure clean input
 	getline(cin, name);
 
 	cout << endl << endl << "#== Okay, " << left << setfill('=') 
