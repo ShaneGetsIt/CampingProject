@@ -7,7 +7,7 @@
     <Position X="4.395" Y="0.5" Height="1.198" Width="1.971" />
   </Comment>
   <Comment CommentText="^         SupplyManager --&gt;&#xD;&#xA; |       has-a relationship w/&#xD;&#xA; |_____    SupplyList  &amp;&#xD;&#xA;   --------DynamicArray&#xD;&#xA;   |             (composition)&#xD;&#xA;&lt;..">
-    <Position X="2.947" Y="9.354" Height="1.219" Width="1.7" />
+    <Position X="2.927" Y="9.52" Height="1.219" Width="1.7" />
   </Comment>
   <Comment CommentText="DynamicArray.h&#xD;&#xA;SupplyManager.cpp&#xD;&#xA;CampingAssn1.cpp&#xD;&#xA;&#xD;&#xA;depend on this class">
     <Position X="7.104" Y="6.906" Height="1.042" Width="1.7" />
