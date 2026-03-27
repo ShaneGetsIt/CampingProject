@@ -405,6 +405,7 @@ int SupplyList::binarySearchFoodByName(const string& name) const
         }
     }
 
+    
     return -1; // not found
 }
 
