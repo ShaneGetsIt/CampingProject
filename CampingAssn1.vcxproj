@@ -127,6 +127,7 @@
     <ClCompile Include="GeneralSupplies.cpp" />
     <ClCompile Include="HikingSupplies.cpp" />
     <ClCompile Include="Itin.cpp" />
+    <ClCompile Include="LinkedList.cpp" />
     <ClCompile Include="Logs.cpp" />
     <ClCompile Include="LogSelect.cpp" />
     <ClCompile Include="Menu.cpp" />
@@ -142,6 +143,7 @@
     <ClInclude Include="HikingSupplies.h" />
     <ClInclude Include="InvalidIndexExceptions.h" />
     <ClInclude Include="Itin.h" />
+    <ClInclude Include="LinkedList.h" />
     <ClInclude Include="Logs.h" />
     <ClInclude Include="LogSelect.h" />
     <ClInclude Include="Menu.h" />

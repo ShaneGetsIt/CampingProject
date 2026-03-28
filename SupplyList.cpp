@@ -4,14 +4,14 @@
 SupplyList::SupplyList()
     : listName("General Supplies"), maxCapacity(MAX_ARRAY), listPriority(medium)
 {
-    // vectors default-construct empty
+    // WEEK 08: LinkedLists default-construct empty (changed from vectors)
 }
 
 // Parameterized constructor
 SupplyList::SupplyList(string name, int capacity, priority prio)
     : listName(name), maxCapacity(capacity), listPriority(prio)
 {
-    // vectors default-construct empty
+    // WEEK 08: LinkedLists default-construct empty (changed from vectors)
 }
 
 // Getters for base class data
@@ -76,7 +76,7 @@ void SupplyList::extrasFunc(char ch, int length)
             case food:
             {
                 // Add food entry if room
-                if (static_cast<int>(foodList.size()) < length)
+                if (foodList.size() < length)  // WEEK 08: LinkedList::size()
                 {
                     inventoryItem temp;
                     temp.item = food;
@@ -98,7 +98,7 @@ void SupplyList::extrasFunc(char ch, int length)
                         cin >> choice;
                     }
                     temp.prio = static_cast<priority>(choice - 1);
-                    foodList.push_back(temp);
+                    foodList.push_back(temp);  // WEEK 08: LinkedList::push_back()
                 }
                 else
                     cout << " Limit for additional food items reached" << endl << endl;
@@ -108,7 +108,7 @@ void SupplyList::extrasFunc(char ch, int length)
             case gear:
             {
                 // Add gear entry if room
-                if (static_cast<int>(gearList.size()) < length)
+                if (gearList.size() < length)  // WEEK 08: LinkedList::size()
                 {
                     inventoryItem temp;
                     temp.item = gear;
@@ -130,7 +130,7 @@ void SupplyList::extrasFunc(char ch, int length)
                         cin >> choice;
                     }
                     temp.prio = static_cast<priority>(choice - 1);
-                    gearList.push_back(temp);
+                    gearList.push_back(temp);  // WEEK 08: LinkedList::push_back()
                 }
                 else
                     cout << " Limit for additional gear items reached" << endl << endl;
@@ -157,51 +157,31 @@ void SupplyList::addItems(ofstream& outData, bool& raiseFlag, int length)
         return;
     }
 
-    if (!foodList.empty())
+    if (!foodList.empty())  // WEEK 08: LinkedList::empty()
     {
         outData << right << setw(35) << setfill('-') << "-" << endl
             << setw(27) << setfill('.') << left << "Extra food to pack" << "Priority" << endl;
 
-        for (size_t i = 0; i < foodList.size(); ++i)
+        // WEEK 08: Can still use index-based loop with LinkedList::at()
+        for (int i = 0; i < foodList.size(); ++i)
         {
-            const inventoryItem& it = foodList[i];
+            const inventoryItem& it = foodList.at(i);  // WEEK 08: LinkedList::at()
             outData << left << it.quantity << setw(30) << "x " + it.itemName;
-            if (it.prio == 0)
-            {
-                outData << right << setw(4) << "Low" << endl;
-            }
-            else if (it.prio == 1)
-            {
-                outData << right << setw(4) << "Med" << endl;
-            }
-            else if (it.prio == 2)
-            {
-                outData << right << setw(4) << "High" << endl;
-            }
+            outData << right << setw(4) << getPriorityString(it.prio) << endl;
         }
     }
 
-    if (!gearList.empty())
+    if (!gearList.empty())  // WEEK 08: LinkedList::empty()
     {
         outData << right << setw(35) << setfill('-') << "-" << endl
             << setw(27) << setfill('.') << left << "Extra gear to pack" << "Priority" << endl;
 
-        for (size_t i = 0; i < gearList.size(); ++i)
+        // WEEK 08: Can still use index-based loop
+        for (int i = 0; i < gearList.size(); ++i)
         {
-            const inventoryItem& it = gearList[i];
+            const inventoryItem& it = gearList.at(i);  // WEEK 08: LinkedList::at()
             outData << left << it.quantity << setw(30) << "x " + it.itemName;
-            if (it.prio == 0)
-            {
-                outData << right << setw(4) << "Low" << endl;
-            }
-            else if (it.prio == 1)
-            {
-                outData << right << setw(4) << "Med" << endl;
-            }
-            else if (it.prio == 2)
-            {
-                outData << right << setw(4) << "High" << endl;
-            }
+            outData << right << setw(4) << getPriorityString(it.prio) << endl;
         }
     }
 }
@@ -209,51 +189,33 @@ void SupplyList::addItems(ofstream& outData, bool& raiseFlag, int length)
 // Print stored extra items to console
 void SupplyList::printItems(int length)
 {
-    if (!foodList.empty())
+    if (!foodList.empty())  // WEEK 08: LinkedList::empty()
     {
         cout << right << setw(35) << setfill('-') << "-" << endl
             << setw(27) << setfill('.') << left << "Extra food to pack" << "Priority" << endl;
 
-        for (size_t i = 0; i < foodList.size(); ++i)
+        // WEEK 08: Using iterator - demonstrates LinkedListIterator usage
+        LinkedListIterator<inventoryItem> iter = foodList.begin();
+        while (iter != foodList.end())
         {
-            const inventoryItem& it = foodList[i];
-            cout << left << it.quantity << setw(30) << "x " + it.itemName;
-            if (it.prio == 0)
-            {
-                cout << right << setw(4) << "Low" << endl;
-            }
-            else if (it.prio == 1)
-            {
-                cout << right << setw(4) << "Med" << endl;
-            }
-            else if (it.prio == 2)
-            {
-                cout << right << setw(4) << "High" << endl;
-            }
+            cout << left << iter->quantity << setw(30) << "x " + iter->itemName;
+            cout << right << setw(4) << getPriorityString(iter->prio) << endl;
+            ++iter;
         }
     }
 
-    if (!gearList.empty())
+    if (!gearList.empty())  // WEEK 08: LinkedList::empty()
     {
         cout << right << setw(35) << setfill('-') << "-" << endl
             << setw(27) << setfill('.') << left << "Extra gear to pack" << "Priority" << endl;
 
-        for (size_t i = 0; i < gearList.size(); ++i)
+        // WEEK 08: Using iterator for gear list too
+        LinkedListIterator<inventoryItem> iter = gearList.begin();
+        while (iter != gearList.end())
         {
-            const inventoryItem& it = gearList[i];
-            cout << left << it.quantity << setw(30) << "x " + it.itemName;
-            if (it.prio == 0)
-            {
-                cout << right << setw(4) << "Low" << endl;
-            }
-            else if (it.prio == 1)
-            {
-                cout << right << setw(4) << "Med" << endl;
-            }
-            else if (it.prio == 2)
-            {
-                cout << right << setw(4) << "High" << endl;
-            }
+            cout << left << iter->quantity << setw(30) << "x " + iter->itemName;
+            cout << right << setw(4) << getPriorityString(iter->prio) << endl;
+            ++iter;
         }
     }
 }
@@ -263,29 +225,29 @@ void SupplyList::printItems(int length)
 // Add food item without user interaction; returns false if list is full
 bool SupplyList::addFoodItem(const inventoryItem& item)
 {
-    if (static_cast<int>(foodList.size()) >= MAX_ARRAY) return false;
-    foodList.push_back(item);
+    if (foodList.size() >= MAX_ARRAY) return false;  // WEEK 08: LinkedList::size()
+    foodList.push_back(item);  // WEEK 08: LinkedList::push_back()
     return true;
 }
 
 // Add gear item without user interaction; returns false if list is full
 bool SupplyList::addGearItem(const inventoryItem& item)
 {
-    if (static_cast<int>(gearList.size()) >= MAX_ARRAY) return false;
-    gearList.push_back(item);
+    if (gearList.size() >= MAX_ARRAY) return false;  // WEEK 08: LinkedList::size()
+    gearList.push_back(item);  // WEEK 08: LinkedList::push_back()
     return true;
 }
 
 // Get current food count
 int SupplyList::getFoodCount() const
 {
-    return static_cast<int>(foodList.size());
+    return foodList.size();  // WEEK 08: LinkedList::size()
 }
 
 // Get current gear count
 int SupplyList::getGearCount() const
 {
-    return static_cast<int>(gearList.size());
+    return gearList.size();  // WEEK 08: LinkedList::size()
 }
 
 // Get total item count (food + gear)
@@ -297,13 +259,18 @@ int SupplyList::getTotalItemCount() const
 // Calculate average food quantity (guards against divide by zero)
 double SupplyList::getAverageFoodQuantity() const
 {
-    if (foodList.empty()) return 0.0;
+    if (foodList.empty()) return 0.0;  // WEEK 08: LinkedList::empty()
 
     int total = 0;
-    for (size_t i = 0; i < foodList.size(); ++i)
+    
+    // WEEK 08: Using iterator to demonstrate LinkedList traversal
+    LinkedListIterator<inventoryItem> iter = foodList.begin();
+    while (iter != foodList.end())
     {
-        total += foodList[i].quantity;
+        total += iter->quantity;
+        ++iter;
     }
+    
     return static_cast<double>(total) / static_cast<double>(foodList.size());
 }
 
@@ -326,54 +293,61 @@ string SupplyList::getPriorityString(priority prio) const
 // Get food item at index (for testing)
 const SupplyList::inventoryItem& SupplyList::getFoodItem(int index) const
 {
-    return foodList.at(index);
+    return foodList.at(index);  // WEEK 08: LinkedList::at()
 }
 
 // Get gear item at index (for testing)
 const SupplyList::inventoryItem& SupplyList::getGearItem(int index) const
 {
-    return gearList.at(index);
+    return gearList.at(index);  // WEEK 08: LinkedList::at()
 }
 
 // Clear all items (for testing)
 void SupplyList::clearAll()
 {
-    foodList.clear();
-    gearList.clear();
+    foodList.clear();  // WEEK 08: LinkedList::clear()
+    gearList.clear();  // WEEK 08: LinkedList::clear()
 }
 
 // Sequential (linear) search on foodList - returns index or -1 if not found
 int SupplyList::sequentialSearchFood(const string& name) const
-
-{        //using size_t for loop index to avoid signed/unsigned mismatch with vector size
-
-
-    for (size_t i = 0; i < foodList.size(); ++i)
+{
+    // WEEK 08: Using iterator to traverse LinkedList
+    LinkedListIterator<inventoryItem> iter = foodList.begin();
+    int index = 0;
+    
+    while (iter != foodList.end())
     {
-        if (foodList[i].itemName == name)
+        if (iter->itemName == name)
         {
-            return static_cast<int>(i);
+            return index;
         }
+        ++iter;
+        index++;
     }
+    
     return -1;
 }
 
 // Insertion sort (by itemName) for foodList
 void SupplyList::insertionSortFoodByName()
 {
-    // Classic insertion sort operating on vector<inventoryItem>
-    for (size_t i = 1; i < foodList.size(); ++i)
+    // WEEK 08: Insertion sort works with LinkedList using at() for access
+    // Note: This is O(n²) but demonstrates LinkedList can support sorting
+    for (int i = 1; i < foodList.size(); ++i)
     {
-        inventoryItem key = foodList[i];
-        int j = static_cast<int>(i) - 1;
+        inventoryItem key = foodList.at(i);
+        int j = i - 1;
 
         // Compare by itemName
-        while (j >= 0 && foodList[static_cast<size_t>(j)].itemName > key.itemName)
+        while (j >= 0 && foodList.at(j).itemName > key.itemName)
         {
-            foodList[static_cast<size_t>(j + 1)] = foodList[static_cast<size_t>(j)];
+            // Note: This creates a copy - LinkedList at() returns reference
+            inventoryItem temp = foodList.at(j);
+            foodList.at(j + 1) = temp;
             --j;
         }
-        foodList[static_cast<size_t>(j + 1)] = key;
+        foodList.at(j + 1) = key;
     }
 }
 
@@ -381,15 +355,15 @@ void SupplyList::insertionSortFoodByName()
 // Classic low/mid/high implementation
 int SupplyList::binarySearchFoodByName(const string& name) const
 {
-    if (foodList.empty()) return -1;
+    if (foodList.empty()) return -1;  // WEEK 08: LinkedList::empty()
 
     int low = 0;
-    int high = static_cast<int>(foodList.size()) - 1;
+    int high = foodList.size() - 1;  // WEEK 08: LinkedList::size()
 
     while (low <= high)
     {
-		int mid = low + (high - low) / 2; // Avoids potential overflow
-        const string& midName = foodList[static_cast<size_t>(mid)].itemName;
+        int mid = low + (high - low) / 2; // Avoids potential overflow
+        const string& midName = foodList.at(mid).itemName;  // WEEK 08: LinkedList::at()
 
         if (midName == name)
         {
@@ -405,15 +379,41 @@ int SupplyList::binarySearchFoodByName(const string& name) const
         }
     }
 
-    
     return -1; // not found
 }
 
-// Virtual destructor (ADDED for abstract base class)
+// Virtual method - returns supply type (base class version)
+// Derived classes (GeneralSupplies, HikingSupplies) override this
+string SupplyList::getSupplyType() const
+{
+    return "Generic Supply List";
+}
+
+// Virtual method - outputs supply info to stream
+// Derived classes override this for polymorphic output
+void SupplyList::toStream(ostream& out) const
+{
+    out << "Supply List: " << listName << endl;
+    out << "Capacity: " << maxCapacity << endl;
+    out << "Priority: " << getPriorityString(listPriority) << endl;
+    out << "Total Items: " << getTotalItemCount() << endl;
+    out << "Food Items: " << getFoodCount() << endl;
+    out << "Gear Items: " << getGearCount() << endl;
+}
+
+// WEEK 06 ADDITION: Operator== for comparing two SupplyList objects
+bool SupplyList::operator==(const SupplyList& other) const
+{
+    return (listName == other.listName && 
+            maxCapacity == other.maxCapacity && 
+            listPriority == other.listPriority);
+}
+
+// Virtual destructor
 SupplyList::~SupplyList()
 {
-    // No dynamic memory to clean up in base class
-    // Derived classes will handle their own cleanup
+    // WEEK 08: LinkedList destructor automatically cleans up nodes
+    // No manual cleanup needed
 }
 
 // WEEK 06 ADDITION: Operator<< overload as non-member friend function

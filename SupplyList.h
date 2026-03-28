@@ -4,60 +4,64 @@
 #include <fstream>
 #include <iomanip>
 #include <string>
-#include <windows.h>
-#include <vector>
+#include "LinkedList.h"  // WEEK 08: Replace <vector> with custom LinkedList
 
 using namespace std;
 
-// Max extra items per category
-const int MAX_ARRAY = 5;
+const int MAX_ARRAY = 10;
 
-// Global priority enum (used across multiple base classes)
 enum priority { low, medium, high };
 
-// Forward declaration for friend function
-class SupplyList;
-ostream& operator<<(ostream& out, const SupplyList& supply);
-
-// SupplyList encapsulates additional food/gear items entered by user
 class SupplyList
 {
 public:
-    // Nested types (moved inside class)
-    enum itemType { food, gear };
+    enum itemType { food, gear, other };
 
+    // WEEK 08: Add equality operator for LinkedList operations
     struct inventoryItem
     {
         string itemName;
-        itemType item = food;
-        priority prio = low;
-        int quantity = 0;
+        itemType item;
+        priority prio;
+        int quantity;
+        
+        // Equality operator - needed for LinkedList deleteNode() and search()
+        bool operator==(const inventoryItem& other) const
+        {
+            // Two items are equal if they have the same name and type
+            return (itemName == other.itemName && item == other.item);
+        }
     };
 
-    // Default constructor
+private:
+    string listName;
+    int maxCapacity;
+    priority listPriority;
+    
+    // WEEK 08: Replace vector with LinkedList
+    LinkedList<inventoryItem> foodList;
+    LinkedList<inventoryItem> gearList;
+
+public:
+    // Constructors
     SupplyList();
-
-    // Parameterized constructor (makes this a proper base class)
     SupplyList(string name, int capacity, priority prio);
-
-    // Virtual destructor (ADDED for abstract base class)
     virtual ~SupplyList();
 
-    // Pure virtual function (ADDED - makes this class abstract)
-    virtual string getSupplyType() const = 0;
+    // Getters/Setters
+    string getListName() const;
+    int getMaxCapacity() const;
+    priority getListPriority() const;
+    void setListName(string name);
+    void setMaxCapacity(int capacity);
+    void setListPriority(priority prio);
 
-    // WEEK 06 ADDITION: Pure virtual function for polymorphic streaming
-    // Derived classes override this to provide custom output format
-    virtual void toStream(ostream& out) const = 0;
-
-    // Collect extras from user (interactive)
+    // Interactive functions
     void extrasFunc(char ch, int length);
-    // Write extra items to output file
     void addItems(ofstream& outData, bool& raiseFlag, int length);
-    // Print extra items to console
     void printItems(int length);
 
-    // Test-friendly methods (non-interactive)
+    // Test-friendly methods
     bool addFoodItem(const inventoryItem& item);
     bool addGearItem(const inventoryItem& item);
     int getFoodCount() const;
@@ -69,39 +73,16 @@ public:
     const inventoryItem& getGearItem(int index) const;
     void clearAll();
 
-    // Week 09 additions: vector search & sort operations (food list)
-    // Sequential (linear) search on foodList - returns index or -1 if not found
+    // Search/Sort operations
     int sequentialSearchFood(const string& name) const;
-
-    // Insertion sort (sort foodList in-place by itemName, ascending)
     void insertionSortFoodByName();
-
-    // Binary search on foodList by itemName - requires foodList to be sorted first
-    // Returns index of found element or -1 if not found
     int binarySearchFoodByName(const string& name) const;
 
-    // Getters for base class data
-    string getListName() const;
-    int getMaxCapacity() const;
-    priority getListPriority() const;
+    // Virtual methods for polymorphism
+    virtual string getSupplyType() const;
+    virtual void toStream(ostream& out) const;
 
-    // Setters for base class data
-    void setListName(string name);
-    void setMaxCapacity(int capacity);
-    void setListPriority(priority prio);
-
-    // WEEK 06 ADDITION: Friend function for operator<<
-    // Uses polymorphism to call derived class toStream()
+    // Operator overloading
     friend ostream& operator<<(ostream& out, const SupplyList& supply);
-
-protected:
-    // Base class data members (required by assignment)
-    string listName;           // Name of this supply list
-    int maxCapacity;           // Maximum items
-    priority listPriority;     // Overall priority of this supply category
-
-private:
-    // Replaced fixed-size C arrays with std::vector for dynamic management
-    std::vector<inventoryItem> foodList; // stored extra food items
-    std::vector<inventoryItem> gearList; // stored extra gear items
+    bool operator==(const SupplyList& other) const;
 };

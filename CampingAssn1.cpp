@@ -10,6 +10,7 @@
 #include "LogSelect.h"
 #include "SupplyManager.h"
 #include "DynamicArray.h"  // WEEK 06 ADDITION
+#include "LinkedList.h"    // WEEK 08 ADDITION
 #include "DebugMemoryCheck.h" // Added: CRT memory leak checker (Debug-only)
 
 const string extras = "Extras.txt"; // legacy filenames
@@ -749,6 +750,427 @@ TEST_CASE("Duplicates: sequential returns first occurrence; sort is stable") {
 	int idx = supply.binarySearchFoodByName("Grape");
 	CHECK(idx != -1);
 	CHECK(supply.getFoodItem(idx).itemName == "Grape");
+}
+
+// ============= WEEK 10 TESTS - LINKED LIST ADT =============
+
+// Q) LinkedList basic operations - empty list and insertion
+TEST_CASE("LinkedList: Insert into empty list") {
+	LinkedList<int> list;
+
+	// Empty list checks
+	CHECK(list.empty() == true);
+	CHECK(list.size() == 0);
+
+	// Insert one item
+	list.insertBack(42);
+
+	CHECK(list.empty() == false);
+	CHECK(list.size() == 1);
+	CHECK(list.at(0) == 42);
+}
+
+TEST_CASE("LinkedList: Insert at front and back (unordered)") {
+	LinkedList<string> list;
+
+	// Demonstrate TWO insertion positions (unordered requirement)
+	list.insertBack("World");   // Back insertion
+	list.insertFront("Hello");  // Front insertion
+	list.insertBack("!");       // Back insertion
+
+	CHECK(list.size() == 3);
+	CHECK(list.at(0) == "Hello");  // Front insertion placed this first
+	CHECK(list.at(1) == "World");  // Original item shifted
+	CHECK(list.at(2) == "!");      // Back insertion at end
+}
+
+TEST_CASE("LinkedList: Multiple insertFront operations") {
+	LinkedList<int> list;
+
+	list.insertFront(30);
+	list.insertFront(20);
+	list.insertFront(10);
+
+	// Front insertion reverses order: last inserted becomes first
+	CHECK(list.size() == 3);
+	CHECK(list.at(0) == 10);
+	CHECK(list.at(1) == 20);
+	CHECK(list.at(2) == 30);
+}
+
+// R) LinkedList deletion operations
+TEST_CASE("LinkedList: Delete existing node") {
+	LinkedList<int> list;
+	list.insertBack(10);
+	list.insertBack(20);
+	list.insertBack(30);
+
+	CHECK(list.size() == 3);
+
+	// Delete middle item
+	bool deleted = list.deleteNode(20);
+
+	CHECK(deleted == true);
+	CHECK(list.size() == 2);
+	CHECK(list.at(0) == 10);
+	CHECK(list.at(1) == 30);  // Items shifted after deletion
+}
+
+TEST_CASE("LinkedList: Delete non-existent node") {
+	LinkedList<int> list;
+	list.insertBack(10);
+	list.insertBack(20);
+
+	// Try to delete item not in list
+	bool deleted = list.deleteNode(99);
+
+	CHECK(deleted == false);
+	CHECK(list.size() == 2);  // Size unchanged
+}
+
+TEST_CASE("LinkedList: Delete first node") {
+	LinkedList<int> list;
+	list.insertBack(10);
+	list.insertBack(20);
+	list.insertBack(30);
+
+	bool deleted = list.deleteNode(10);  // Delete first
+
+	CHECK(deleted == true);
+	CHECK(list.size() == 2);
+	CHECK(list.at(0) == 20);  // New first element
+}
+
+TEST_CASE("LinkedList: Delete last node") {
+	LinkedList<int> list;
+	list.insertBack(10);
+	list.insertBack(20);
+	list.insertBack(30);
+
+	bool deleted = list.deleteNode(30);  // Delete last
+
+	CHECK(deleted == true);
+	CHECK(list.size() == 2);
+	CHECK(list.at(1) == 20);  // Last element now
+}
+
+TEST_CASE("LinkedList: Delete from single-item list") {
+	LinkedList<int> list;
+	list.insertBack(42);
+
+	bool deleted = list.deleteNode(42);
+
+	CHECK(deleted == true);
+	CHECK(list.empty() == true);
+	CHECK(list.size() == 0);
+}
+
+// S) LinkedList search operations
+TEST_CASE("LinkedList: Search in empty list") {
+	LinkedList<int> list;
+
+	// Searching empty list should return false
+	CHECK(list.search(42) == false);
+}
+
+TEST_CASE("LinkedList: Search for existing item") {
+	LinkedList<string> list;
+	list.insertBack("Apple");
+	list.insertBack("Banana");
+	list.insertBack("Cherry");
+
+	CHECK(list.search("Banana") == true);
+	CHECK(list.search("Apple") == true);
+	CHECK(list.search("Cherry") == true);
+}
+
+TEST_CASE("LinkedList: Search for non-existing item") {
+	LinkedList<string> list;
+	list.insertBack("Apple");
+	list.insertBack("Banana");
+
+	CHECK(list.search("Grape") == false);
+	CHECK(list.search("Orange") == false);
+}
+
+// T) LinkedList iterator operations
+TEST_CASE("LinkedList: Traverse empty list with iterator") {
+	LinkedList<int> list;
+
+	LinkedListIterator<int> iter = list.begin();
+
+	// Iterator should equal end() for empty list
+	CHECK(iter == list.end());
+}
+
+TEST_CASE("LinkedList: Iterator traversal and data access") {
+	LinkedList<int> list;
+	list.insertBack(1);
+	list.insertBack(2);
+	list.insertBack(3);
+
+	LinkedListIterator<int> iter = list.begin();
+	int count = 0;
+	int sum = 0;
+
+	// Traverse using iterator
+	while (iter != list.end())
+	{
+		sum += *iter;  // Dereference operator
+		count++;
+		++iter;        // Pre-increment operator
+	}
+
+	CHECK(count == 3);
+	CHECK(sum == 6);
+}
+
+TEST_CASE("LinkedList: Iterator with struct data") {
+	LinkedList<SupplyList::inventoryItem> list;
+
+	SupplyList::inventoryItem item1 = { "Tent", SupplyList::gear, high, 1 };
+	SupplyList::inventoryItem item2 = { "Rope", SupplyList::gear, medium, 2 };
+
+	list.insertBack(item1);
+	list.insertBack(item2);
+
+	LinkedListIterator<SupplyList::inventoryItem> iter = list.begin();
+
+	// Test arrow operator for accessing struct members
+	CHECK(iter->itemName == "Tent");
+	CHECK(iter->quantity == 1);
+
+	++iter;
+	CHECK(iter->itemName == "Rope");
+	CHECK(iter->quantity == 2);
+}
+
+// U) LinkedList copy operations
+TEST_CASE("LinkedList: Copy constructor creates deep copy") {
+	LinkedList<int> list1;
+	list1.insertBack(10);
+	list1.insertBack(20);
+	list1.insertBack(30);
+
+	// Copy constructor
+	LinkedList<int> list2(list1);
+
+	CHECK(list2.size() == 3);
+	CHECK(list2.at(0) == 10);
+	CHECK(list2.at(1) == 20);
+	CHECK(list2.at(2) == 30);
+
+	// Modify list1 - should not affect list2 (deep copy)
+	list1.deleteNode(10);
+
+	CHECK(list1.size() == 2);
+	CHECK(list2.size() == 3);  // list2 unchanged
+}
+
+TEST_CASE("LinkedList: Assignment operator") {
+	LinkedList<int> list1;
+	list1.insertBack(5);
+	list1.insertBack(15);
+	list1.insertBack(25);
+
+	LinkedList<int> list2;
+	list2.insertBack(99);  // list2 has different data
+
+	// Assignment operator
+	list2 = list1;
+
+	CHECK(list2.size() == 3);
+	CHECK(list2.at(0) == 5);
+	CHECK(list2.at(1) == 15);
+	CHECK(list2.at(2) == 25);
+
+	// Modify list1 - should not affect list2
+	list1.insertBack(35);
+
+	CHECK(list1.size() == 4);
+	CHECK(list2.size() == 3);  // list2 unchanged
+}
+
+TEST_CASE("LinkedList: Self-assignment") {
+	LinkedList<int> list;
+	list.insertBack(1);
+	list.insertBack(2);
+
+	// Self-assignment should not crash
+	list = list;
+
+	CHECK(list.size() == 2);
+	CHECK(list.at(0) == 1);
+	CHECK(list.at(1) == 2);
+}
+
+// V) LinkedList clear and memory management
+TEST_CASE("LinkedList: Clear removes all elements") {
+	LinkedList<int> list;
+	list.insertBack(1);
+	list.insertBack(2);
+	list.insertBack(3);
+
+	CHECK(list.size() == 3);
+
+	list.clear();
+
+	CHECK(list.empty() == true);
+	CHECK(list.size() == 0);
+}
+
+TEST_CASE("LinkedList: Clear on empty list") {
+	LinkedList<int> list;
+
+	// Clearing empty list should not crash
+	list.clear();
+
+	CHECK(list.empty() == true);
+	CHECK(list.size() == 0);
+}
+
+// W) LinkedList array-style access
+TEST_CASE("LinkedList: Array-style access with at()") {
+	LinkedList<int> list;
+	list.insertBack(100);
+	list.insertBack(200);
+	list.insertBack(300);
+
+	CHECK(list.at(0) == 100);
+	CHECK(list.at(1) == 200);
+	CHECK(list.at(2) == 300);
+}
+
+TEST_CASE("LinkedList: at() throws on invalid index") {
+	LinkedList<int> list;
+	list.insertBack(42);
+
+	// Valid access
+	CHECK(list.at(0) == 42);
+
+	// Invalid access should throw
+	CHECK_THROWS_AS(list.at(-1), out_of_range);
+	CHECK_THROWS_AS(list.at(5), out_of_range);
+}
+
+TEST_CASE("LinkedList: operator[] access") {
+	LinkedList<string> list;
+	list.insertBack("First");
+	list.insertBack("Second");
+	list.insertBack("Third");
+
+	CHECK(list[0] == "First");
+	CHECK(list[1] == "Second");
+	CHECK(list[2] == "Third");
+}
+
+TEST_CASE("LinkedList: Modify elements via operator[]") {
+	LinkedList<int> list;
+	list.insertBack(10);
+	list.insertBack(20);
+
+	// Modify through operator[]
+	list[0] = 99;
+	list[1] = 88;
+
+	CHECK(list[0] == 99);
+	CHECK(list[1] == 88);
+}
+
+// X) SupplyList integration with LinkedList
+TEST_CASE("SupplyList with LinkedList: Add and count items") {
+	GeneralSupplies supply;
+	SupplyList::inventoryItem item1 = { "Rice", SupplyList::food, low, 2 };
+	SupplyList::inventoryItem item2 = { "Pasta", SupplyList::food, medium, 3 };
+
+	supply.addFoodItem(item1);
+	supply.addFoodItem(item2);
+
+	CHECK(supply.getFoodCount() == 2);
+	CHECK(supply.getTotalItemCount() == 2);
+}
+
+TEST_CASE("SupplyList with LinkedList: Sequential search") {
+	GeneralSupplies supply;
+	SupplyList::inventoryItem item1 = { "Bread", SupplyList::food, low, 5 };
+	SupplyList::inventoryItem item2 = { "Cheese", SupplyList::food, medium, 3 };
+	SupplyList::inventoryItem item3 = { "Apples", SupplyList::food, high, 10 };
+
+	supply.addFoodItem(item1);
+	supply.addFoodItem(item2);
+	supply.addFoodItem(item3);
+
+	// Search for existing items
+	CHECK(supply.sequentialSearchFood("Cheese") == 1);
+	CHECK(supply.sequentialSearchFood("Bread") == 0);
+	CHECK(supply.sequentialSearchFood("Apples") == 2);
+
+	// Search for non-existing item
+	CHECK(supply.sequentialSearchFood("Pizza") == -1);
+}
+
+TEST_CASE("SupplyList with LinkedList: Clear all items") {
+	GeneralSupplies supply;
+	SupplyList::inventoryItem item = { "Item", SupplyList::food, low, 1 };
+
+	supply.addFoodItem(item);
+	supply.addGearItem(item);
+
+	CHECK(supply.getFoodCount() == 1);
+	CHECK(supply.getGearCount() == 1);
+
+	supply.clearAll();
+
+	CHECK(supply.getFoodCount() == 0);
+	CHECK(supply.getGearCount() == 0);
+}
+
+TEST_CASE("SupplyList with LinkedList: Average quantity calculation") {
+	GeneralSupplies supply;
+	SupplyList::inventoryItem item1 = { "Item1", SupplyList::food, low, 10 };
+	SupplyList::inventoryItem item2 = { "Item2", SupplyList::food, medium, 20 };
+	SupplyList::inventoryItem item3 = { "Item3", SupplyList::food, high, 30 };
+
+	supply.addFoodItem(item1);
+	supply.addFoodItem(item2);
+	supply.addFoodItem(item3);
+
+	// Average = (10 + 20 + 30) / 3 = 20.0
+	CHECK(supply.getAverageFoodQuantity() == doctest::Approx(20.0));
+}
+
+TEST_CASE("SupplyList with LinkedList: Reach capacity limit") {
+	GeneralSupplies supply;
+	SupplyList::inventoryItem item = { "Item", SupplyList::food, low, 1 };
+
+	// Fill to MAX_ARRAY capacity
+	for (int i = 0; i < MAX_ARRAY; i++)
+	{
+		CHECK(supply.addFoodItem(item) == true);
+	}
+
+	CHECK(supply.getFoodCount() == MAX_ARRAY);
+
+	// Try to add one more - should fail
+	CHECK(supply.addFoodItem(item) == false);
+	CHECK(supply.getFoodCount() == MAX_ARRAY);  // Size unchanged
+}
+
+TEST_CASE("SupplyList with LinkedList: Access items by index") {
+	GeneralSupplies supply;
+	SupplyList::inventoryItem item1 = { "First", SupplyList::food, low, 1 };
+	SupplyList::inventoryItem item2 = { "Second", SupplyList::food, medium, 2 };
+
+	supply.addFoodItem(item1);
+	supply.addFoodItem(item2);
+
+	const SupplyList::inventoryItem& retrieved1 = supply.getFoodItem(0);
+	const SupplyList::inventoryItem& retrieved2 = supply.getFoodItem(1);
+
+	CHECK(retrieved1.itemName == "First");
+	CHECK(retrieved1.quantity == 1);
+	CHECK(retrieved2.itemName == "Second");
+	CHECK(retrieved2.quantity == 2);
 }
 
 // ============= MAIN PROGRAM =============
