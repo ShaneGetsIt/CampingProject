@@ -1499,6 +1499,7 @@ TEST_CASE("Queue - Mixed enqueue and dequeue operations")
 	CHECK(q.frontElement() == 40);
 }
 
+
 // ============= WEEK 11 TESTS - STACK/QUEUE INTEGRATION =============
 
 //***********************************************************
