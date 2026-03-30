@@ -131,6 +131,8 @@
     <ClCompile Include="Logs.cpp" />
     <ClCompile Include="LogSelect.cpp" />
     <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="Queue.cpp" />
+    <ClCompile Include="Stack.cpp" />
     <ClCompile Include="SupplyList.cpp" />
     <ClCompile Include="SupplyManager.cpp" />
   </ItemGroup>
@@ -147,6 +149,8 @@
     <ClInclude Include="Logs.h" />
     <ClInclude Include="LogSelect.h" />
     <ClInclude Include="Menu.h" />
+    <ClInclude Include="Queue.h" />
+    <ClInclude Include="Stack.h" />
     <ClInclude Include="SupplyList.h" />
     <ClInclude Include="SupplyManager.h" />
   </ItemGroup>

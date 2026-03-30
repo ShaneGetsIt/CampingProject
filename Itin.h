@@ -3,50 +3,65 @@
 
 #include <string>
 #include <fstream>
-#include <iostream>
-#include <iomanip>
-#include "SupplyList.h"  // For priority enum
+#include "Stack.h"  // WEEK 11: Stack for undo/redo functionality
+#include "SupplyList.h"
+
 using namespace std;
 
-const int MAX_NIGHTS = 10;       // Maximum nights for itinerary
-const int MAX_ITINERARIES = 10;  // Maximum saved itinerary files (then wraps)
+// Priority levels for activities
+//enum priority { low, medium, high };
 
 class Itin
 {
-protected:
-	int nightsStaying;  // protected so derived classes can access
-
-private:
-	string activities[MAX_NIGHTS];    // fixed array of activity names
-	priority importance[MAX_NIGHTS];  // priority for each activity (using global enum)
-	int activityCount;                // tracks how many activities added
-	static int totalItineraries;      // shared counter across all Itin objects
-	
 public:
-	// Constructors
-	Itin();
-	Itin(int nights, priority prior);
-	
-	// Setters
-	void setNightsStaying(int nights);
-	void setImportance(int index, priority prior);
-	void addActivity(const string& activity, priority prior);
-	void addActivity(const string& activity);  // uses medium as default
-	
-	// Getters
-	int getNightsStaying() const;
-	priority getImportance(int index) const;
-	string getActivity(int index) const;
-	int getActivityCount() const;
-	string getPriorityString(priority prior) const;
-	string getPriorityString(int index) const;
-	static int getTotalItineraries();  // get counter value
-	
-	// Core functionality
-	void buildItinerary();
-	void writeToFile(const string& filename);
-	void writeIndexedFile();  // Auto-increments and uses next file number
-	void print() const;
+    Itin();
+    Itin(int nights, priority p);
+    
+    // Activity management
+    void addActivity(string activity, priority p);
+    void buildItinerary();
+    
+    // Undo/Redo functionality using Stack
+    bool undoLastActivity();
+    bool redoLastActivity();
+    bool canUndo() const;
+    bool canRedo() const;
+    
+    // File operations
+    void writeToFile(string filename);
+    void writeIndexedFile();
+    
+    // Getters
+    int getNightsStaying() const;
+    int getActivityCount() const;
+    string getActivity(int index) const;
+    priority getActivityPriority(int index) const;
+    
+    // Display
+    void printItinerary() const;
+    void printUndoRedoStatus() const;
+    
+private:
+    struct Activity
+    {
+        string name;
+        priority priorityLevel;
+    };
+    
+    Activity* activities;        // Dynamic array of activities
+    int nightsStaying;
+    int activityCount;
+    int maxActivities;
+    priority itineraryPriority;
+    
+    // Undo/Redo stacks - store activity indices
+    Stack undoStack;    // Stores count of activities before each add
+    Stack redoStack;    // Stores activities that were undone
+    
+    // Helper functions
+    void resizeActivities();
+    void saveStateForUndo();
+    string getPriorityString(priority p) const;
 };
 
 #endif
