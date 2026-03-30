@@ -11,6 +11,8 @@
 #include "SupplyManager.h"
 #include "DynamicArray.h"  // WEEK 06 ADDITION
 #include "LinkedList.h"    // WEEK 08 ADDITION
+#include "Stack.h"         // WEEK 11 ADDITION
+#include "Queue.h"         // WEEK 11 ADDITION
 #include "DebugMemoryCheck.h" // Added: CRT memory leak checker (Debug-only)
 
 const string extras = "Extras.txt"; // legacy filenames
@@ -537,8 +539,6 @@ TEST_CASE("Operator-=: Invalid index does not affect size") {
 	CHECK(manager.getSize() == initialSize);
 }
 
-
-
 TEST_CASE("Operator-=: Remove all items one by one") {
 	SupplyManager manager;
 	manager += new GeneralSupplies("First", 10, low);
@@ -669,7 +669,7 @@ TEST_CASE("Template Class: DynamicArray bounds checking") {
 	CHECK(arr[0] == 42);
 	
 	// Invalid access - should throw InvalidIndexException
-	CHECK_THROWS_AS(arr[10], InvalidIndexException);           //****************************
+	CHECK_THROWS_AS(arr[10], InvalidIndexException);
 }
 
 // ============= WEEK 09 TESTS - VECTOR SEARCH & SORT =============
@@ -1173,6 +1173,483 @@ TEST_CASE("SupplyList with LinkedList: Access items by index") {
 	CHECK(retrieved2.quantity == 2);
 }
 
+// ============= WEEK 11 TESTS - STACK AND QUEUE =============
+
+//***********************************************************
+// Stack Tests
+//***********************************************************
+
+TEST_CASE("Stack - Default constructor creates empty stack")
+{
+	Stack s;
+	CHECK(s.isEmptyStack() == true);
+}
+
+TEST_CASE("Stack - Push single element")
+{
+	Stack s;
+	s.push(10);
+	CHECK(s.isEmptyStack() == false);
+	CHECK(s.peek() == 10);
+}
+
+TEST_CASE("Stack - Push multiple elements")
+{
+	Stack s;
+	s.push(10);
+	s.push(20);
+	s.push(30);
+
+	CHECK(s.peek() == 30);
+	CHECK(s.isEmptyStack() == false);
+}
+
+TEST_CASE("Stack - Pop single element")
+{
+	Stack s;
+	s.push(10);
+	s.pop();
+
+	CHECK(s.isEmptyStack() == true);
+}
+
+TEST_CASE("Stack - Pop multiple elements")
+{
+	Stack s;
+	s.push(10);
+	s.push(20);
+	s.push(30);
+
+	s.pop();
+	CHECK(s.peek() == 20);
+
+	s.pop();
+	CHECK(s.peek() == 10);
+
+	s.pop();
+	CHECK(s.isEmptyStack() == true);
+}
+
+TEST_CASE("Stack - LIFO order verification")
+{
+	Stack s;
+	s.push(5);
+	s.push(15);
+	s.push(25);
+	s.push(35);
+
+	CHECK(s.peek() == 35);
+	s.pop();
+	CHECK(s.peek() == 25);
+	s.pop();
+	CHECK(s.peek() == 15);
+	s.pop();
+	CHECK(s.peek() == 5);
+}
+
+TEST_CASE("Stack - Pop from empty stack")
+{
+	Stack s;
+	// Should print error message but not crash
+	s.pop();
+	CHECK(s.isEmptyStack() == true);
+}
+
+TEST_CASE("Stack - Push many elements (no size limit)")
+{
+	Stack s;
+
+	// Push 1000 elements
+	for (int i = 1; i <= 1000; i++)
+	{
+		s.push(i);
+	}
+
+	CHECK(s.peek() == 1000);
+	CHECK(s.isEmptyStack() == false);
+}
+
+TEST_CASE("Stack - Initialize stack clears all elements")
+{
+	Stack s;
+	s.push(10);
+	s.push(20);
+	s.push(30);
+
+	s.initializeStack();
+	CHECK(s.isEmptyStack() == true);
+}
+
+TEST_CASE("Stack - Copy constructor")
+{
+	Stack s1;
+	s1.push(5);
+	s1.push(10);
+	s1.push(15);
+
+	Stack s2(s1);
+
+	CHECK(s2.isEmptyStack() == false);
+	CHECK(s2.peek() == 15);
+
+	s2.pop();
+	CHECK(s2.peek() == 10);
+
+	// Original stack should be unchanged
+	CHECK(s1.peek() == 15);
+}
+
+TEST_CASE("Stack - Assignment operator")
+{
+	Stack s1;
+	s1.push(100);
+	s1.push(200);
+
+	Stack s2;
+	s2.push(999);
+
+	s2 = s1;
+
+	CHECK(s2.peek() == 200);
+	s2.pop();
+	CHECK(s2.peek() == 100);
+}
+
+TEST_CASE("Stack - Self assignment")
+{
+	Stack s1;
+	s1.push(42);
+
+	s1 = s1;
+
+	CHECK(s1.peek() == 42);
+	CHECK(s1.isEmptyStack() == false);
+}
+
+//***********************************************************
+// Queue Tests
+//***********************************************************
+
+TEST_CASE("Queue - Default constructor creates empty queue")
+{
+	Queue q;
+	CHECK(q.isEmptyQueue() == true);
+}
+
+TEST_CASE("Queue - Enqueue single element")
+{
+	Queue q;
+	q.enqueue(10);
+	CHECK(q.isEmptyQueue() == false);
+	CHECK(q.frontElement() == 10);
+}
+
+TEST_CASE("Queue - Enqueue multiple elements")
+{
+	Queue q;
+	q.enqueue(10);
+	q.enqueue(20);
+	q.enqueue(30);
+
+	CHECK(q.frontElement() == 10);
+	CHECK(q.isEmptyQueue() == false);
+}
+
+TEST_CASE("Queue - Dequeue single element")
+{
+	Queue q;
+	q.enqueue(10);
+	q.dequeue();
+
+	CHECK(q.isEmptyQueue() == true);
+}
+
+TEST_CASE("Queue - Dequeue multiple elements")
+{
+	Queue q;
+	q.enqueue(10);
+	q.enqueue(20);
+	q.enqueue(30);
+
+	q.dequeue();
+	CHECK(q.frontElement() == 20);
+
+	q.dequeue();
+	CHECK(q.frontElement() == 30);
+
+	q.dequeue();
+	CHECK(q.isEmptyQueue() == true);
+}
+
+TEST_CASE("Queue - FIFO order verification")
+{
+	Queue q;
+	q.enqueue(5);
+	q.enqueue(15);
+	q.enqueue(25);
+	q.enqueue(35);
+
+	CHECK(q.frontElement() == 5);
+	q.dequeue();
+	CHECK(q.frontElement() == 15);
+	q.dequeue();
+	CHECK(q.frontElement() == 25);
+	q.dequeue();
+	CHECK(q.frontElement() == 35);
+}
+
+TEST_CASE("Queue - Dequeue from empty queue")
+{
+	Queue q;
+	// Should print error message but not crash
+	q.dequeue();
+	CHECK(q.isEmptyQueue() == true);
+}
+
+TEST_CASE("Queue - Enqueue many elements (no size limit)")
+{
+	Queue q;
+
+	// Enqueue 1000 elements
+	for (int i = 1; i <= 1000; i++)
+	{
+		q.enqueue(i);
+	}
+
+	CHECK(q.frontElement() == 1);
+	CHECK(q.isEmptyQueue() == false);
+}
+
+TEST_CASE("Queue - Initialize queue clears all elements")
+{
+	Queue q;
+	q.enqueue(10);
+	q.enqueue(20);
+	q.enqueue(30);
+
+	q.initializeQueue();
+	CHECK(q.isEmptyQueue() == true);
+}
+
+TEST_CASE("Queue - Copy constructor")
+{
+	Queue q1;
+	q1.enqueue(5);
+	q1.enqueue(10);
+	q1.enqueue(15);
+
+	Queue q2(q1);
+
+	CHECK(q2.isEmptyQueue() == false);
+	CHECK(q2.frontElement() == 5);
+
+	q2.dequeue();
+	CHECK(q2.frontElement() == 10);
+
+	// Original queue should be unchanged
+	CHECK(q1.frontElement() == 5);
+}
+
+TEST_CASE("Queue - Assignment operator")
+{
+	Queue q1;
+	q1.enqueue(100);
+	q1.enqueue(200);
+
+	Queue q2;
+	q2.enqueue(999);
+
+	q2 = q1;
+
+	CHECK(q2.frontElement() == 100);
+	q2.dequeue();
+	CHECK(q2.frontElement() == 200);
+}
+
+TEST_CASE("Queue - Self assignment")
+{
+	Queue q1;
+	q1.enqueue(42);
+
+	q1 = q1;
+
+	CHECK(q1.frontElement() == 42);
+	CHECK(q1.isEmptyQueue() == false);
+}
+
+TEST_CASE("Queue - Mixed enqueue and dequeue operations")
+{
+	Queue q;
+
+	q.enqueue(10);
+	q.enqueue(20);
+	CHECK(q.frontElement() == 10);
+
+	q.dequeue();
+	CHECK(q.frontElement() == 20);
+
+	q.enqueue(30);
+	q.enqueue(40);
+	CHECK(q.frontElement() == 20);
+
+	q.dequeue();
+	CHECK(q.frontElement() == 30);
+
+	q.dequeue();
+	CHECK(q.frontElement() == 40);
+}
+
+// ============= WEEK 11 TESTS - STACK/QUEUE INTEGRATION =============
+
+//***********************************************************
+// Undo/Redo Integration Tests
+//***********************************************************
+
+TEST_CASE("Integration: Itin undo single activity")
+{
+	Itin trip(3, medium);
+	
+	trip.addActivity("Hiking", high);
+	CHECK(trip.getActivityCount() == 1);
+	CHECK(trip.canUndo() == true);
+	
+	bool undone = trip.undoLastActivity();
+	CHECK(undone == true);
+	CHECK(trip.getActivityCount() == 0);
+}
+
+TEST_CASE("Integration: Itin undo multiple activities")
+{
+	Itin trip(3, medium);
+	
+	trip.addActivity("Hiking", high);
+	trip.addActivity("Fishing", medium);
+	trip.addActivity("Swimming", low);
+	
+	CHECK(trip.getActivityCount() == 3);
+	
+	trip.undoLastActivity();
+	CHECK(trip.getActivityCount() == 2);
+	CHECK(trip.getActivity(0) == "Hiking");
+	CHECK(trip.getActivity(1) == "Fishing");
+}
+
+TEST_CASE("Integration: Itin redo after undo")
+{
+	Itin trip(2, high);
+	
+	trip.addActivity("Kayaking", high);
+	trip.addActivity("Camping", medium);
+	
+	CHECK(trip.getActivityCount() == 2);
+	
+	trip.undoLastActivity();
+	CHECK(trip.getActivityCount() == 1);
+	CHECK(trip.canRedo() == true);
+	
+	bool redone = trip.redoLastActivity();
+	CHECK(redone == true);
+	CHECK(trip.getActivityCount() == 2);
+	CHECK(trip.getActivity(1) == "Camping");
+}
+
+TEST_CASE("Integration: Itin cannot undo when empty")
+{
+	Itin trip(1, low);
+	
+	CHECK(trip.canUndo() == false);
+	bool undone = trip.undoLastActivity();
+	CHECK(undone == false);
+}
+
+TEST_CASE("Integration: Itin cannot redo without undo")
+{
+	Itin trip(2, medium);
+	
+	trip.addActivity("Test", low);
+	CHECK(trip.canRedo() == false);
+	bool redone = trip.redoLastActivity();
+	CHECK(redone == false);
+}
+
+TEST_CASE("Integration: Itin redo clears after new action")
+{
+	Itin trip(3, high);
+	
+	trip.addActivity("Activity1", low);
+	trip.addActivity("Activity2", medium);
+	
+	trip.undoLastActivity();
+	CHECK(trip.canRedo() == true);
+	
+	// Adding new activity should clear redo stack
+	trip.addActivity("Activity3", high);
+	CHECK(trip.canRedo() == false);
+}
+
+TEST_CASE("Integration: Itin multiple undo/redo sequence")
+{
+	Itin trip(5, medium);
+	
+	trip.addActivity("A1", low);
+	trip.addActivity("A2", medium);
+	trip.addActivity("A3", high);
+	
+	CHECK(trip.getActivityCount() == 3);
+	
+	// Undo twice
+	trip.undoLastActivity();
+	trip.undoLastActivity();
+	CHECK(trip.getActivityCount() == 1);
+	
+	// Redo once
+	trip.redoLastActivity();
+	CHECK(trip.getActivityCount() == 2);
+	CHECK(trip.getActivity(0) == "A1");
+	CHECK(trip.getActivity(1) == "A2");
+}
+
+//***********************************************************
+// Queue Integration Tests - Packing Order
+//***********************************************************
+
+TEST_CASE("Integration: Queue for packing order")
+{
+	Queue packingOrder;
+	
+	// Items added in priority order
+	packingOrder.enqueue(1);  // Tent (high priority)
+	packingOrder.enqueue(2);  // Sleeping bag
+	packingOrder.enqueue(3);  // Food
+	
+	CHECK(packingOrder.isEmptyQueue() == false);
+	
+	// Process items in FIFO order
+	CHECK(packingOrder.frontElement() == 1);
+	packingOrder.dequeue();
+	CHECK(packingOrder.frontElement() == 2);
+	packingOrder.dequeue();
+	CHECK(packingOrder.frontElement() == 3);
+}
+
+TEST_CASE("Integration: Stack for reverse printing")
+{
+	Stack reverseStack;
+	
+	// Push activities in order
+	reverseStack.push(1);  // First activity
+	reverseStack.push(2);  // Second activity
+	reverseStack.push(3);  // Third activity
+	
+	// Pop gives reverse order (LIFO)
+	CHECK(reverseStack.peek() == 3);
+	reverseStack.pop();
+	CHECK(reverseStack.peek() == 2);
+	reverseStack.pop();
+	CHECK(reverseStack.peek() == 1);
+}
+
+
 // ============= MAIN PROGRAM =============
 int main(int argc, char** argv)
 {
@@ -1182,7 +1659,7 @@ int main(int argc, char** argv)
 
 	// Check if we should run tests (Debug mode or if --test flag is passed)
 #if defined(_DEBUG) || defined(RUN_TESTS)
-    return doctest::Context(argc, argv).run();
+	return doctest::Context(argc, argv).run();
 #else
 	// In release mode, check command line for test flag
 	for (int i = 1; i < argc; ++i) {
@@ -1190,7 +1667,7 @@ int main(int argc, char** argv)
 			return doctest::Context(argc, argv).run();
 		}
 	}
-	
+
 	// Otherwise run normal camping list generator
 	string name;
 	string extraItem;
@@ -1219,49 +1696,49 @@ int main(int argc, char** argv)
 		LogSelect logMenu("Guest");
 		logMenu.selectLog();
 		cout << endl;
-		
+
 		// Clear input stream before proceeding to bannerAndInput
 		cin.clear();
 		cin.ignore(50, '\n');
 	}
 
 	bannerAndInput(name, campers, nightsStaying, firesPlanned, ch);
-	
+
 	// Create Itin object with nightsStaying from user input
 	Itin itinerary(nightsStaying, medium);
-	
+
 	supply.extrasFunc(ch, MAX_ARRAY);
-	
+
 	// Ask about hiking supplies (optional) - stack allocated
 	char hikingChoice;
 	HikingSupplies hikingSupplies;  // Default constructed on stack
 	bool hasHikingSupplies = false;
-	
+
 	cout << endl << "# Will this trip involve hiking? (Y/N) #" << endl;
 	cin >> hikingChoice;
 	cin.ignore(50, '\n');
-	
+
 	if (hikingChoice == 'Y' || hikingChoice == 'y')
 	{
 		int difficulty;
 		double distance;
-		
+
 		cout << "# Enter trail difficulty (1=Easy, 2=Moderate, 3=Difficult): ";
 		cin >> difficulty;
 		cin.ignore(50, '\n');
-		
+
 		cout << "# Enter distance in miles: ";
 		cin >> distance;
 		cin.ignore(50, '\n');
-		
+
 		// Set hiking supplies properties
 		hikingSupplies = HikingSupplies("Hiking Gear", MAX_ARRAY, high, difficulty, distance);
 		hikingSupplies.addHikingEssentials();
 		hasHikingSupplies = true;
-		
+
 		cout << endl;
 	}
-	
+
 	calculations(campers, nightsStaying, firesPlanned, fireStarter,
 		lbsMarshmallow);
 	printSave(supply, itinerary, hikingSupplies, hasHikingSupplies, MAX_ARRAY, name, campers, nightsStaying,
@@ -1365,7 +1842,7 @@ void calculations(int campers, int nightsStaying, int firesPlanned, int& fireSta
 }
 
 void printSave(SupplyList& supply, Itin& itinerary, HikingSupplies& hikingSupplies, bool hasHikingSupplies,
-	int length, string name, int campers, int nightsStaying, int firesPlanned, int fireStarter, 
+	int length, string name, int campers, int nightsStaying, int firesPlanned, int fireStarter,
 	double lbsMarshmallow, char ch, bool& raiseFlag)
 {
 	// Use Menu class instead of menuSelect() function
