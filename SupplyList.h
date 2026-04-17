@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iomanip>
 #include <string>
+#include <stdexcept>
 #include "LinkedList.h"  // WEEK 08: Replace <vector> with custom LinkedList
 
 using namespace std;
@@ -72,6 +73,7 @@ public:
     const inventoryItem& getFoodItem(int index) const;
     const inventoryItem& getGearItem(int index) const;
     void clearAll();
+    int loadItemsFromJsonFile(const string& filename);
 
     // Search/Sort operations
     int sequentialSearchFood(const string& name) const;

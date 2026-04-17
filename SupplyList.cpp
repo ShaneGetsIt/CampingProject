@@ -1,4 +1,7 @@
 #include "SupplyList.h"
+#include "json.hpp"
+
+using json = nlohmann::json;
 
 // Default constructor
 SupplyList::SupplyList()
@@ -307,6 +310,88 @@ void SupplyList::clearAll()
 {
     foodList.clear();  // WEEK 08: LinkedList::clear()
     gearList.clear();  // WEEK 08: LinkedList::clear()
+}
+
+int SupplyList::loadItemsFromJsonFile(const string& filename)
+{
+    try
+    {
+        ifstream inFile(filename);
+
+        if (!inFile)
+        {
+            throw runtime_error("JSON file could not be opened: " + filename);
+        }
+
+        json data;
+        inFile >> data;
+
+        if (!data.is_array())
+        {
+            throw runtime_error("JSON root must be an array.");
+        }
+
+        int loadedCount = 0;
+
+        // Week 13 JSON: each JSON object becomes an inventoryItem and is added
+        // to the existing LinkedList-backed foodList or gearList.
+        for (const auto& entry : data)
+        {
+            string itemName = entry.at("itemName").get<string>();
+            string category = entry.at("category").get<string>();
+            string priorityText = entry.at("priority").get<string>();
+            int quantity = entry.at("quantity").get<int>();
+
+            inventoryItem item;
+            item.itemName = itemName;
+            item.quantity = quantity;
+
+            if (priorityText == "low")
+            {
+                item.prio = low;
+            }
+            else if (priorityText == "medium")
+            {
+                item.prio = medium;
+            }
+            else if (priorityText == "high")
+            {
+                item.prio = high;
+            }
+            else
+            {
+                throw runtime_error("Invalid priority in JSON: " + priorityText);
+            }
+
+            if (category == "food")
+            {
+                item.item = food;
+                if (addFoodItem(item))
+                {
+                    loadedCount++;
+                }
+            }
+            else if (category == "gear")
+            {
+                item.item = gear;
+                if (addGearItem(item))
+                {
+                    loadedCount++;
+                }
+            }
+            else
+            {
+                throw runtime_error("Invalid category in JSON: " + category);
+            }
+        }
+
+        return loadedCount;
+    }
+    catch (const exception& ex)
+    {
+        cout << "# JSON load error: " << ex.what() << " #" << endl;
+        return 0;
+    }
 }
 
 // Sequential (linear) search on foodList - returns index or -1 if not found

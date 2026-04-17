@@ -101,9 +101,18 @@
     <ClInclude Include="Queue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="json.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="TESTING_README.md" />
     <None Include="ClassDiagram1.cd" />
+    <None Include="camping_recommendations.json">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="malformed_camping.json">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -1,0 +1,32 @@
+[
+  {
+    "itemName": "Trail Mix",
+    "category": "food",
+    "priority": "medium",
+    "quantity": 4
+  },
+  {
+    "itemName": "Water Bottles",
+    "category": "food",
+    "priority": "high",
+    "quantity": 8
+  },
+  {
+    "itemName": "Granola Bars",
+    "category": "food",
+    "priority": "medium",
+    "quantity": 12
+  },
+  {
+    "itemName": "First Aid Kit",
+    "category": "gear",
+    "priority": "high",
+    "quantity": 1
+  },
+  {
+    "itemName": "Flashlight",
+    "category": "gear",
+    "priority": "high",
+    "quantity": 2
+  }
+]
