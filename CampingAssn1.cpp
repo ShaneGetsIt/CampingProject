@@ -1173,6 +1173,41 @@ TEST_CASE("SupplyList with LinkedList: Access items by index") {
 	CHECK(retrieved2.quantity == 2);
 }
 
+// ============= WEEK 13 TESTS - JSON DATA LOADING =============
+
+TEST_CASE("Week 13 JSON: loads recommended items into SupplyList")
+{
+	GeneralSupplies supply;
+
+	int loadedCount = supply.loadItemsFromJsonFile("camping_recommendations.json");
+
+	CHECK(loadedCount == 5);
+	CHECK(supply.getFoodCount() == 3);
+	CHECK(supply.getGearCount() == 2);
+	CHECK(supply.getFoodItem(0).itemName == "Trail Mix");
+	CHECK(supply.getGearItem(0).itemName == "First Aid Kit");
+}
+
+TEST_CASE("Week 13 JSON: missing file is handled")
+{
+	GeneralSupplies supply;
+
+	int loadedCount = supply.loadItemsFromJsonFile("missing_camping_file.json");
+
+	CHECK(loadedCount == 0);
+	CHECK(supply.getTotalItemCount() == 0);
+}
+
+TEST_CASE("Week 13 JSON: malformed file is handled")
+{
+	GeneralSupplies supply;
+
+	int loadedCount = supply.loadItemsFromJsonFile("malformed_camping.json");
+
+	CHECK(loadedCount == 0);
+	CHECK(supply.getTotalItemCount() == 0);
+}
+
 // ============= WEEK 11 TESTS - STACK AND QUEUE =============
 
 //***********************************************************
@@ -1682,6 +1717,7 @@ int main(int argc, char** argv)
 	int firesPlanned;
 	bool raiseFlag = false;
 	GeneralSupplies supply;
+	const string jsonSupplyFile = "camping_recommendations.json";
 
 	colorText();
 
@@ -1709,6 +1745,15 @@ int main(int argc, char** argv)
 
 	// Create Itin object with nightsStaying from user input
 	Itin itinerary(nightsStaying, medium);
+
+	// Week 13 JSON: load recommended camping items into the existing SupplyList
+    // before user-entered extras are added.
+	int jsonItemsLoaded = supply.loadItemsFromJsonFile(jsonSupplyFile);
+
+	if (jsonItemsLoaded > 0)
+	{
+		cout << "# Loaded " << jsonItemsLoaded << " recommended items from JSON. #" << endl;
+	}
 
 	supply.extrasFunc(ch, MAX_ARRAY);
 
