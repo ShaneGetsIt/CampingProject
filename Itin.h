@@ -45,7 +45,7 @@ private:
     struct Activity
     {
         string name;
-        priority priorityLevel;
+        priority priorityLevel = low;
     };
     
     Activity* activities;        // Dynamic array of activities
