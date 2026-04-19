@@ -1,11 +1,13 @@
 #include "SupplyList.h"
+#include "json.hpp"
+
+using json = nlohmann::json;
 
 // Default constructor
 SupplyList::SupplyList()
     : listName("General Supplies"), maxCapacity(MAX_ARRAY), listPriority(medium)
 {
     // WEEK 08: LinkedLists default-construct empty (changed from vectors)
-    // WEEK 12: STLMap objects also default-construct empty
 }
 
 // Parameterized constructor
@@ -13,7 +15,6 @@ SupplyList::SupplyList(string name, int capacity, priority prio)
     : listName(name), maxCapacity(capacity), listPriority(prio)
 {
     // WEEK 08: LinkedLists default-construct empty (changed from vectors)
-    // WEEK 12: STLMap objects also default-construct empty
 }
 
 // Getters for base class data
@@ -101,7 +102,6 @@ void SupplyList::extrasFunc(char ch, int length)
                     }
                     temp.prio = static_cast<priority>(choice - 1);
                     foodList.push_back(temp);  // WEEK 08: LinkedList::push_back()
-                    foodMap.insertItem(temp.itemName, temp.quantity); // WEEK 12: Insert into STL map
                 }
                 else
                     cout << " Limit for additional food items reached" << endl << endl;
@@ -134,7 +134,6 @@ void SupplyList::extrasFunc(char ch, int length)
                     }
                     temp.prio = static_cast<priority>(choice - 1);
                     gearList.push_back(temp);  // WEEK 08: LinkedList::push_back()
-                    gearMap.insertItem(temp.itemName, temp.quantity); // WEEK 12: Insert into STL map
                 }
                 else
                     cout << " Limit for additional gear items reached" << endl << endl;
@@ -231,7 +230,6 @@ bool SupplyList::addFoodItem(const inventoryItem& item)
 {
     if (foodList.size() >= MAX_ARRAY) return false;  // WEEK 08: LinkedList::size()
     foodList.push_back(item);  // WEEK 08: LinkedList::push_back()
-    foodMap.insertItem(item.itemName, item.quantity); // WEEK 12: Insert into STL map
     return true;
 }
 
@@ -240,7 +238,6 @@ bool SupplyList::addGearItem(const inventoryItem& item)
 {
     if (gearList.size() >= MAX_ARRAY) return false;  // WEEK 08: LinkedList::size()
     gearList.push_back(item);  // WEEK 08: LinkedList::push_back()
-    gearMap.insertItem(item.itemName, item.quantity); // WEEK 12: Insert into STL map
     return true;
 }
 
@@ -268,7 +265,7 @@ double SupplyList::getAverageFoodQuantity() const
     if (foodList.empty()) return 0.0;  // WEEK 08: LinkedList::empty()
 
     int total = 0;
-
+    
     // WEEK 08: Using iterator to demonstrate LinkedList traversal
     LinkedListIterator<inventoryItem> iter = foodList.begin();
     while (iter != foodList.end())
@@ -276,7 +273,7 @@ double SupplyList::getAverageFoodQuantity() const
         total += iter->quantity;
         ++iter;
     }
-
+    
     return static_cast<double>(total) / static_cast<double>(foodList.size());
 }
 
@@ -313,102 +310,97 @@ void SupplyList::clearAll()
 {
     foodList.clear();  // WEEK 08: LinkedList::clear()
     gearList.clear();  // WEEK 08: LinkedList::clear()
-    foodMap.initializeMap();  // WEEK 12: Clear STL map
-    gearMap.initializeMap();  // WEEK 12: Clear STL map
 }
 
-// WEEK 12 ADDITION: Lookup food quantity by item name using STL map
-bool SupplyList::lookupFoodQuantity(const string& name, int& quantity) const
+int SupplyList::loadItemsFromJsonFile(const string& filename)
 {
-    return foodMap.lookupItem(name, quantity);
-}
-
-// WEEK 12 ADDITION: Lookup gear quantity by item name using STL map
-bool SupplyList::lookupGearQuantity(const string& name, int& quantity) const
-{
-    return gearMap.lookupItem(name, quantity);
-}
-
-// WEEK 12 ADDITION: Delete food item by name from LinkedList and STL map
-bool SupplyList::deleteFoodByName(const string& name)
-{
-    LinkedListIterator<inventoryItem> iter = foodList.begin();
-
-    while (iter != foodList.end())
+    try
     {
-        if (iter->itemName == name)
+        ifstream inFile(filename);
+
+        if (!inFile)
         {
-            inventoryItem temp = *iter;
-            foodList.deleteNode(temp);   // WEEK 08: Remove from LinkedList
-            foodMap.deleteItem(name);    // WEEK 12: Remove from STL map
-            return true;
+            throw runtime_error("JSON file could not be opened: " + filename);
         }
-        ++iter;
+
+        json data;
+        inFile >> data;
+
+        if (!data.is_array())
+        {
+            throw runtime_error("JSON root must be an array.");
+        }
+
+        int loadedCount = 0;
+
+        // Week 13 JSON: each JSON object becomes an inventoryItem and is added
+        // to the existing LinkedList-backed foodList or gearList.
+        for (const auto& entry : data)
+        {
+            string itemName = entry.at("itemName").get<string>();
+            string category = entry.at("category").get<string>();
+            string priorityText = entry.at("priority").get<string>();
+            int quantity = entry.at("quantity").get<int>();
+
+            inventoryItem item;
+            item.itemName = itemName;
+            item.quantity = quantity;
+
+            if (priorityText == "low")
+            {
+                item.prio = low;
+            }
+            else if (priorityText == "medium")
+            {
+                item.prio = medium;
+            }
+            else if (priorityText == "high")
+            {
+                item.prio = high;
+            }
+            else
+            {
+                throw runtime_error("Invalid priority in JSON: " + priorityText);
+            }
+
+            if (category == "food")
+            {
+                item.item = food;
+                if (addFoodItem(item))
+                {
+                    loadedCount++;
+                }
+            }
+            else if (category == "gear")
+            {
+                item.item = gear;
+                if (addGearItem(item))
+                {
+                    loadedCount++;
+                }
+            }
+            else
+            {
+                throw runtime_error("Invalid category in JSON: " + category);
+            }
+        }
+
+        return loadedCount;
     }
-
-    return false;
-}
-
-// WEEK 12 ADDITION: Delete gear item by name from LinkedList and STL map
-bool SupplyList::deleteGearByName(const string& name)
-{
-    LinkedListIterator<inventoryItem> iter = gearList.begin();
-
-    while (iter != gearList.end())
+    catch (const exception& ex)
     {
-        if (iter->itemName == name)
-        {
-            inventoryItem temp = *iter;
-            gearList.deleteNode(temp);   // WEEK 08: Remove from LinkedList
-            gearMap.deleteItem(name);    // WEEK 12: Remove from STL map
-            return true;
-        }
-        ++iter;
+        cout << "# JSON load error: " << ex.what() << " #" << endl;
+        return 0;
     }
-
-    return false;
-}
-
-// WEEK 12 ADDITION: Return current number of food map entries
-int SupplyList::getFoodMapSize() const
-{
-    return foodMap.getSize();
-}
-
-// WEEK 12 ADDITION: Return current number of gear map entries
-int SupplyList::getGearMapSize() const
-{
-    return gearMap.getSize();
-}
-
-// WEEK 12 ADDITION: Print food map contents
-void SupplyList::printFoodMap() const
-{
-    foodMap.printMap();
-}
-
-// WEEK 12 ADDITION: Print gear map contents
-void SupplyList::printGearMap() const
-{
-    gearMap.printMap();
 }
 
 // Sequential (linear) search on foodList - returns index or -1 if not found
 int SupplyList::sequentialSearchFood(const string& name) const
 {
-    // WEEK 12: Use STL map to enhance the existing name-based lookup.
-    // The map checks whether the key exists first, while the LinkedList
-    // is still used to preserve the original return type (index).
-    int quantity = 0;
-    if (!foodMap.lookupItem(name, quantity))
-    {
-        return -1;
-    }
-
     // WEEK 08: Using iterator to traverse LinkedList
     LinkedListIterator<inventoryItem> iter = foodList.begin();
     int index = 0;
-
+    
     while (iter != foodList.end())
     {
         if (iter->itemName == name)
@@ -418,7 +410,7 @@ int SupplyList::sequentialSearchFood(const string& name) const
         ++iter;
         index++;
     }
-
+    
     return -1;
 }
 
@@ -426,7 +418,7 @@ int SupplyList::sequentialSearchFood(const string& name) const
 void SupplyList::insertionSortFoodByName()
 {
     // WEEK 08: Insertion sort works with LinkedList using at() for access
-    // Note: This is O(n^2) but demonstrates LinkedList can support sorting
+    // Note: This is O(n²) but demonstrates LinkedList can support sorting
     for (int i = 1; i < foodList.size(); ++i)
     {
         inventoryItem key = foodList.at(i);
@@ -497,16 +489,15 @@ void SupplyList::toStream(ostream& out) const
 // WEEK 06 ADDITION: Operator== for comparing two SupplyList objects
 bool SupplyList::operator==(const SupplyList& other) const
 {
-    return (listName == other.listName &&
-        maxCapacity == other.maxCapacity &&
-        listPriority == other.listPriority);
+    return (listName == other.listName && 
+            maxCapacity == other.maxCapacity && 
+            listPriority == other.listPriority);
 }
 
 // Virtual destructor
 SupplyList::~SupplyList()
 {
     // WEEK 08: LinkedList destructor automatically cleans up nodes
-    // WEEK 12: STLMap destructor automatically clears map contents
     // No manual cleanup needed
 }
 
