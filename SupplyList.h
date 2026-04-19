@@ -1,11 +1,11 @@
-#pragma once
+#pragma once 
 
 #include <iostream>
 #include <fstream>
 #include <iomanip>
 #include <string>
-#include <stdexcept>
 #include "LinkedList.h"  // WEEK 08: Replace <vector> with custom LinkedList
+#include "STLMap.h"      // WEEK 12: Add STL map wrapper for item lookup
 
 using namespace std;
 
@@ -21,11 +21,11 @@ public:
     // WEEK 08: Add equality operator for LinkedList operations
     struct inventoryItem
     {
-        string itemName;
-        itemType item;
-        priority prio;
-        int quantity;
-        
+        string itemName{};
+        itemType item{other};
+        priority prio{low};
+        int quantity{0};
+
         // Equality operator - needed for LinkedList deleteNode() and search()
         bool operator==(const inventoryItem& other) const
         {
@@ -38,10 +38,16 @@ private:
     string listName;
     int maxCapacity;
     priority listPriority;
-    
+
     // WEEK 08: Replace vector with LinkedList
     LinkedList<inventoryItem> foodList;
     LinkedList<inventoryItem> gearList;
+
+    // WEEK 12: STL Maps for fast lookup by item name
+    // Key = item name 
+    // Value = quantity
+    STLMap foodMap;
+    STLMap gearMap;
 
 public:
     // Constructors
@@ -73,14 +79,23 @@ public:
     const inventoryItem& getFoodItem(int index) const;
     const inventoryItem& getGearItem(int index) const;
     void clearAll();
-    int loadItemsFromJsonFile(const string& filename);
+
+    // WEEK 12: STL Map methods
+    bool lookupFoodQuantity(const string& name, int& quantity) const;
+    bool lookupGearQuantity(const string& name, int& quantity) const;
+    bool deleteFoodByName(const string& name);
+    bool deleteGearByName(const string& name);
+    int getFoodMapSize() const;
+    int getGearMapSize() const;
+    void printFoodMap() const;
+    void printGearMap() const;
 
     // Search/Sort operations
     int sequentialSearchFood(const string& name) const;
     void insertionSortFoodByName();
     int binarySearchFoodByName(const string& name) const;
 
-    // Virtual methods for polymorphism
+    // Virtual methods
     virtual string getSupplyType() const;
     virtual void toStream(ostream& out) const;
 
