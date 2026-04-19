@@ -13,7 +13,6 @@
 #include "LinkedList.h"    // WEEK 08 ADDITION
 #include "Stack.h"         // WEEK 11 ADDITION
 #include "Queue.h"         // WEEK 11 ADDITION
-#include "STLMap.h"        // WEEK 12 ADDITION
 #include "DebugMemoryCheck.h" // Added: CRT memory leak checker (Debug-only)
 
 const string extras = "Extras.txt"; // legacy filenames
@@ -43,8 +42,8 @@ T clamp(const T& value, const T& minVal, const T& maxVal)
 void bannerAndInput(string& name, int& campers, int& nightsStaying, int& firesPlanned, char& ch);
 void calculations(int campers, int nightsStaying, int firesPlanned, int& fireStarter,
 	double& lbsMarshmallow);
-void printSave(SupplyList& supply, Itin& itinerary, HikingSupplies& hikingSupplies, bool hasHikingSupplies,
-	int length, string name, int campers, int nightsStaying, int firesPlanned, int fireStarter,
+void printSave(SupplyList& supply, Itin& itinerary, HikingSupplies& hikingSupplies, bool hasHikingSupplies, 
+	int length, string name, int campers, int nightsStaying, int firesPlanned, int fireStarter, 
 	double lbsMarshmallow, char ch, bool& raiseFlag);
 void colorText();
 
@@ -106,10 +105,10 @@ TEST_CASE("Array: Add food items and count") {
 	GeneralSupplies supply;
 	SupplyList::inventoryItem item1 = { "Rice", SupplyList::food, low, 2 };
 	SupplyList::inventoryItem item2 = { "Pasta", SupplyList::food, medium, 3 };
-
+	
 	supply.addFoodItem(item1);
 	supply.addFoodItem(item2);
-
+	
 	CHECK(supply.getFoodCount() == 2);
 }
 
@@ -117,22 +116,22 @@ TEST_CASE("Array: Total items - food plus gear") {
 	GeneralSupplies supply;
 	SupplyList::inventoryItem food1 = { "Bread", SupplyList::food, low, 5 };
 	SupplyList::inventoryItem gear1 = { "Rope", SupplyList::gear, medium, 2 };
-
+	
 	supply.addFoodItem(food1);
 	supply.addGearItem(gear1);
-
+	
 	CHECK(supply.getTotalItemCount() == 2);
 }
 
 TEST_CASE("Array: Boundary - reject when full") {
 	GeneralSupplies supply;
 	SupplyList::inventoryItem item = { "Item", SupplyList::food, low, 1 };
-
+	
 	// Fill to capacity
 	for (int i = 0; i < MAX_ARRAY; i++) {
 		supply.addFoodItem(item);
 	}
-
+	
 	// Should fail when full
 	CHECK(supply.addFoodItem(item) == false);
 }
@@ -141,7 +140,7 @@ TEST_CASE("Array: Boundary - reject when full") {
 TEST_CASE("Class: addFoodItem success") {
 	GeneralSupplies supply;
 	SupplyList::inventoryItem item = { "Apples", SupplyList::food, medium, 10 };
-
+	
 	CHECK(supply.addFoodItem(item) == true);
 	CHECK(supply.getFoodCount() == 1);
 }
@@ -149,10 +148,10 @@ TEST_CASE("Class: addFoodItem success") {
 TEST_CASE("Class: clearAll resets") {
 	GeneralSupplies supply;
 	SupplyList::inventoryItem item = { "Test", SupplyList::food, low, 1 };
-
+	
 	supply.addFoodItem(item);
 	supply.clearAll();
-
+	
 	CHECK(supply.getFoodCount() == 0);
 }
 
@@ -171,7 +170,7 @@ TEST_CASE("Menu: Setters work correctly") {
 	testMenu.setUserName("Alice");
 	testMenu.setNumOptions(5);
 	testMenu.setOption(0, "Option 1");
-
+	
 	CHECK(testMenu.getUserName() == "Alice");
 	CHECK(testMenu.getNumOptions() == 5);
 	CHECK(testMenu.getOption(0) == "Option 1");
@@ -187,7 +186,7 @@ TEST_CASE("Itin: addActivity increases count") {
 	Itin trip(3, medium);
 	trip.addActivity("Hiking", high);
 	trip.addActivity("Fishing", low);
-
+	
 	CHECK(trip.getActivityCount() == 2);
 	CHECK(trip.getActivity(0) == "Hiking");
 	CHECK(trip.getActivity(1) == "Fishing");
@@ -196,12 +195,12 @@ TEST_CASE("Itin: addActivity increases count") {
 // F) Derived class tests - HikingSupplies calls base behavior
 TEST_CASE("HikingSupplies: Derives from SupplyList correctly") {
 	HikingSupplies hiking("Trail Gear", 10, high, 2, 5.5);
-
+	
 	// Base class properties accessible
 	CHECK(hiking.getListName() == "Trail Gear");
 	CHECK(hiking.getMaxCapacity() == 10);
 	CHECK(hiking.getListPriority() == high);
-
+	
 	// Derived class properties
 	CHECK(hiking.getTrailDifficulty() == 2);
 	CHECK(hiking.getDistanceMiles() == doctest::Approx(5.5));
@@ -210,20 +209,20 @@ TEST_CASE("HikingSupplies: Derives from SupplyList correctly") {
 TEST_CASE("HikingSupplies: addHikingEssentials uses base addItem methods") {
 	HikingSupplies hiking("Test", 20, medium, 3, 10.0);
 	hiking.addHikingEssentials();
-
+	
 	// Should have added items using base class methods
 	CHECK(hiking.getFoodCount() > 0);  // At least water bottles + energy bars for difficulty 3
 	CHECK(hiking.getGearCount() > 0);  // At least map, first aid, shelter, GPS for difficulty 3
 	CHECK(hiking.getTotalItemCount() > 0);
 }
 
-// G) Derived class tests - LogSelect extends Menu
+// G) Derived class tests - LogSelect extends Menu 
 TEST_CASE("LogSelect: Derives from Menu correctly") {
 	LogSelect logMenu("TestUser");
-
+	
 	// Base class property accessible
 	CHECK(logMenu.getUserName() == "TestUser");
-
+	
 	// Derived class property
 	CHECK(logMenu.getSelectedLogNumber() == 0);  // Default value
 }
@@ -232,13 +231,13 @@ TEST_CASE("LogSelect: Derives from Menu correctly") {
 TEST_CASE("Logs: Composition - contains Itin and SupplyList") {
 	Itin testItin(3, medium);
 	testItin.addActivity("Kayaking", high);
-
+	
 	GeneralSupplies testSupply("Camp Gear", 10, medium);
 	SupplyList::inventoryItem item = { "Tent", SupplyList::gear, high, 1 };
 	testSupply.addGearItem(item);
-
+	
 	Logs testLog("Summer Trip", testItin, testSupply);
-
+	
 	// Logs contains copies of both objects
 	CHECK(testLog.getLogName() == "Summer Trip");
 	CHECK(testLog.getItinerary().getNightsStaying() == 3);
@@ -248,15 +247,15 @@ TEST_CASE("Logs: Composition - contains Itin and SupplyList") {
 
 TEST_CASE("Logs: Static counter persists across instances") {
 	int initialCount = Logs::getTotalLogs();
-
+	
 	Itin itin1(2, low);
 	GeneralSupplies supply1;
 	Logs log1("Trip1", itin1, supply1);
-
+	
 	Itin itin2(3, high);
 	GeneralSupplies supply2;
 	Logs log2("Trip2", itin2, supply2);
-
+	
 	// Counter should be same for both (static member)
 	CHECK(Logs::getTotalLogs() == initialCount);  // Not incremented unless saveLog() called
 }
@@ -278,25 +277,25 @@ TEST_CASE("Manager: Parameterized constructor sets capacity") {
 
 TEST_CASE("Manager: Add supply increases size") {
 	SupplyManager manager;
-
+	
 	// Create dynamic objects and add to manager
 	GeneralSupplies* general = new GeneralSupplies("Camp Gear", 10, medium);
 	HikingSupplies* hiking = new HikingSupplies("Trail Gear", 20, high, 2, 5.5);
-
+	
 	manager.addSupply(general);
 	manager.addSupply(hiking);
-
+	
 	CHECK(manager.getSize() == 2);
 }
 
 TEST_CASE("Manager: Remove supply decreases size") {
 	SupplyManager manager;
-
+	
 	manager.addSupply(new GeneralSupplies("Test1", 10, low));
 	manager.addSupply(new GeneralSupplies("Test2", 10, medium));
-
+	
 	CHECK(manager.getSize() == 2);
-
+	
 	bool removed = manager.removeSupply(0);
 	CHECK(removed == true);
 	CHECK(manager.getSize() == 1);
@@ -305,7 +304,7 @@ TEST_CASE("Manager: Remove supply decreases size") {
 TEST_CASE("Manager: Remove invalid index returns false") {
 	SupplyManager manager;
 	manager.addSupply(new GeneralSupplies("Test", 10, low));
-
+	
 	CHECK(manager.removeSupply(-1) == false);  // Invalid negative index
 	CHECK(manager.removeSupply(5) == false);   // Out of bounds
 	CHECK(manager.getSize() == 1);             // Size unchanged
@@ -313,23 +312,23 @@ TEST_CASE("Manager: Remove invalid index returns false") {
 
 TEST_CASE("Manager: RemoveAll clears all items") {
 	SupplyManager manager;
-
+	
 	manager.addSupply(new GeneralSupplies("Test1", 10, low));
 	manager.addSupply(new HikingSupplies("Test2", 20, high, 3, 10.0));
 	manager.addSupply(new GeneralSupplies("Test3", 15, medium));
-
+	
 	CHECK(manager.getSize() == 3);
-
+	
 	manager.removeAll();
 	CHECK(manager.getSize() == 0);
 }
 
 TEST_CASE("Manager: GetSupply returns correct pointer") {
 	SupplyManager manager;
-
+	
 	GeneralSupplies* general = new GeneralSupplies("Camp Gear", 10, medium);
 	manager.addSupply(general);
-
+	
 	SupplyList* retrieved = manager.getSupply(0);
 	CHECK(retrieved != nullptr);
 	CHECK(retrieved->getListName() == "Camp Gear");
@@ -338,21 +337,21 @@ TEST_CASE("Manager: GetSupply returns correct pointer") {
 TEST_CASE("Manager: GetSupply with invalid index returns nullptr") {
 	SupplyManager manager;
 	manager.addSupply(new GeneralSupplies("Test", 10, low));
-
+	
 	CHECK(manager.getSupply(-1) == nullptr);
 	CHECK(manager.getSupply(10) == nullptr);
 }
 
 TEST_CASE("Manager: Auto-resize when capacity reached") {
 	SupplyManager manager(2);  // Start with capacity of 2
-
+	
 	CHECK(manager.getCapacity() == 2);
-
+	
 	// Add 3 items - should trigger resize
 	manager.addSupply(new GeneralSupplies("Item1", 10, low));
 	manager.addSupply(new GeneralSupplies("Item2", 10, low));
 	manager.addSupply(new GeneralSupplies("Item3", 10, low));
-
+	
 	CHECK(manager.getSize() == 3);
 	CHECK(manager.getCapacity() == 4);  // Should have doubled from 2 to 4
 }
@@ -370,23 +369,23 @@ TEST_CASE("Virtual: getSupplyType returns correct type for HikingSupplies") {
 
 TEST_CASE("Virtual: Polymorphic call through base pointer") {
 	SupplyList* basePtr = new HikingSupplies("Trail", 20, high, 3, 12.0);
-
+	
 	// Should call HikingSupplies::getSupplyType() due to virtual function
 	CHECK(basePtr->getSupplyType() == "Hiking Supplies - Difficult Trail");
-
+	
 	delete basePtr;  // Virtual destructor ensures proper cleanup
 }
 
 TEST_CASE("Virtual: Manager stores different types polymorphically") {
 	SupplyManager manager;
-
+	
 	manager.addSupply(new GeneralSupplies("General", 10, low));
 	manager.addSupply(new HikingSupplies("Hiking", 20, high, 1, 3.0));
-
+	
 	// Retrieve and check types through base pointer
 	SupplyList* item0 = manager.getSupply(0);
 	SupplyList* item1 = manager.getSupply(1);
-
+	
 	CHECK(item0->getSupplyType() == "General Camping Supplies");
 	CHECK(item1->getSupplyType() == "Hiking Supplies - Easy Trail");
 }
@@ -397,7 +396,7 @@ TEST_CASE("Virtual: Manager stores different types polymorphically") {
 TEST_CASE("Operator==: Equal GeneralSupplies objects") {
 	GeneralSupplies supply1("Camp Gear", 10, medium);
 	GeneralSupplies supply2("Camp Gear", 10, medium);
-
+	
 	// Should be equal (same name, capacity, priority)
 	CHECK(supply1 == supply2);
 }
@@ -405,7 +404,7 @@ TEST_CASE("Operator==: Equal GeneralSupplies objects") {
 TEST_CASE("Operator==: Not equal GeneralSupplies objects - different name") {
 	GeneralSupplies supply1("Camp Gear", 10, medium);
 	GeneralSupplies supply2("Trail Gear", 10, medium);
-
+	
 	// Should NOT be equal (different name)
 	CHECK_FALSE(supply1 == supply2);
 }
@@ -413,7 +412,7 @@ TEST_CASE("Operator==: Not equal GeneralSupplies objects - different name") {
 TEST_CASE("Operator==: Not equal GeneralSupplies objects - different priority") {
 	GeneralSupplies supply1("Camp Gear", 10, medium);
 	GeneralSupplies supply2("Camp Gear", 10, high);
-
+	
 	// Should NOT be equal (different priority)
 	CHECK_FALSE(supply1 == supply2);
 }
@@ -426,7 +425,7 @@ TEST_CASE("Operator<<: GeneralSupplies has correct data for output") {
 	SupplyList::inventoryItem item2 = { "Rope", SupplyList::gear, low, 2 };
 	supply.addGearItem(item1);
 	supply.addGearItem(item2);
-
+	
 	// Verify the data that would be output by operator<<
 	CHECK(supply.getListName() == "Camp Gear");
 	CHECK(supply.getPriorityString(supply.getListPriority()) == "Med");
@@ -436,7 +435,7 @@ TEST_CASE("Operator<<: GeneralSupplies has correct data for output") {
 
 TEST_CASE("Operator<<: HikingSupplies has correct data for output") {
 	HikingSupplies hiking("Trail Gear", 20, high, 3, 12.5);
-
+	
 	// Verify the data that would be output by operator<<
 	CHECK(hiking.getListName() == "Trail Gear");
 	CHECK(hiking.getDifficultyString() == "Difficult");
@@ -447,12 +446,12 @@ TEST_CASE("Operator<<: HikingSupplies has correct data for output") {
 
 TEST_CASE("Operator<<: Polymorphic behavior verified through base pointer") {
 	SupplyList* basePtr = new GeneralSupplies("Test", 5, low);
-
+	
 	// Verify polymorphic toStream() is called correctly
 	// by checking the supply type which uses virtual function
 	CHECK(basePtr->getSupplyType() == "General Camping Supplies");
 	CHECK(basePtr->getListName() == "Test");
-
+	
 	delete basePtr;
 }
 
@@ -461,10 +460,10 @@ TEST_CASE("Operator[]: Valid index returns correct item") {
 	SupplyManager manager;
 	GeneralSupplies* supply1 = new GeneralSupplies("First", 10, low);
 	GeneralSupplies* supply2 = new GeneralSupplies("Second", 15, medium);
-
+	
 	manager.addSupply(supply1);
 	manager.addSupply(supply2);
-
+	
 	// Access via operator[]
 	SupplyList* retrieved = manager[1];
 	CHECK(retrieved != nullptr);
@@ -474,7 +473,7 @@ TEST_CASE("Operator[]: Valid index returns correct item") {
 TEST_CASE("Operator[]: Invalid index throws exception") {
 	SupplyManager manager;
 	manager.addSupply(new GeneralSupplies("Test", 10, low));
-
+	
 	// Out of bounds access should throw
 	CHECK_THROWS_AS(manager[-1], InvalidIndexException);
 	CHECK_THROWS_AS(manager[10], InvalidIndexException);
@@ -482,7 +481,7 @@ TEST_CASE("Operator[]: Invalid index throws exception") {
 
 TEST_CASE("Operator[]: Empty manager throws on any index") {
 	SupplyManager manager;
-
+	
 	// No items in manager - any access should throw
 	CHECK_THROWS_AS(manager[0], InvalidIndexException);
 	CHECK_THROWS_AS(manager[-1], InvalidIndexException);
@@ -492,20 +491,20 @@ TEST_CASE("Operator[]: Empty manager throws on any index") {
 TEST_CASE("Operator+=: Add increases size and stores correct pointer") {
 	SupplyManager manager;
 	GeneralSupplies* supply = new GeneralSupplies("Test", 10, medium);
-
+	
 	manager += supply;
-
+	
 	CHECK(manager.getSize() == 1);
 	CHECK(manager[0]->getListName() == "Test");
 }
 
 TEST_CASE("Operator+=: Multiple adds work correctly") {
 	SupplyManager manager;
-
+	
 	manager += new GeneralSupplies("First", 5, low);
 	manager += new HikingSupplies("Second", 10, high, 2, 5.0);
 	manager += new GeneralSupplies("Third", 15, medium);
-
+	
 	CHECK(manager.getSize() == 3);
 	CHECK(manager[0]->getListName() == "First");
 	CHECK(manager[1]->getListName() == "Second");
@@ -514,16 +513,16 @@ TEST_CASE("Operator+=: Multiple adds work correctly") {
 
 TEST_CASE("Operator-=: Remove deletes and shifts properly") {
 	SupplyManager manager;
-
+	
 	manager += new GeneralSupplies("First", 10, low);
 	manager += new GeneralSupplies("Second", 10, medium);
 	manager += new GeneralSupplies("Third", 10, high);
-
+	
 	CHECK(manager.getSize() == 3);
-
+	
 	// Remove middle item
 	manager -= 1;
-
+	
 	CHECK(manager.getSize() == 2);
 	CHECK(manager[0]->getListName() == "First");
 	CHECK(manager[1]->getListName() == "Third");  // Should have shifted
@@ -532,7 +531,7 @@ TEST_CASE("Operator-=: Remove deletes and shifts properly") {
 TEST_CASE("Operator-=: Invalid index does not affect size") {
 	SupplyManager manager;
 	manager += new GeneralSupplies("Test", 10, low);
-
+	
 	int initialSize = manager.getSize();
 	// operator-= must throw on invalid removal
 	CHECK_THROWS_AS(manager -= 10, InvalidIndexException);
@@ -544,10 +543,10 @@ TEST_CASE("Operator-=: Remove all items one by one") {
 	SupplyManager manager;
 	manager += new GeneralSupplies("First", 10, low);
 	manager += new GeneralSupplies("Second", 10, medium);
-
+	
 	manager -= 0;
 	CHECK(manager.getSize() == 1);
-
+	
 	manager -= 0;
 	CHECK(manager.getSize() == 0);
 }
@@ -568,10 +567,10 @@ TEST_CASE("Manager: printAllRecursive does not throw and preserves size") {
 TEST_CASE("Template Function: maxValue with integers") {
 	int a = 10;
 	int b = 20;
-
+	
 	int result = maxValue(a, b);
 	CHECK(result == 20);
-
+	
 	result = maxValue(b, a);
 	CHECK(result == 20);
 }
@@ -579,7 +578,7 @@ TEST_CASE("Template Function: maxValue with integers") {
 TEST_CASE("Template Function: maxValue with doubles") {
 	double x = 3.14;
 	double y = 2.71;
-
+	
 	double result = maxValue(x, y);
 	CHECK(result == doctest::Approx(3.14));
 }
@@ -588,7 +587,7 @@ TEST_CASE("Template Function: clamp with integers") {
 	int value = 15;
 	int minVal = 10;
 	int maxVal = 20;
-
+	
 	CHECK(clamp(value, minVal, maxVal) == 15);  // Within range
 	CHECK(clamp(5, minVal, maxVal) == 10);      // Below min
 	CHECK(clamp(25, minVal, maxVal) == 20);     // Above max
@@ -598,7 +597,7 @@ TEST_CASE("Template Function: clamp with doubles") {
 	double value = 5.5;
 	double minVal = 0.0;
 	double maxVal = 10.0;
-
+	
 	CHECK(clamp(value, minVal, maxVal) == doctest::Approx(5.5));
 	CHECK(clamp(-1.0, minVal, maxVal) == doctest::Approx(0.0));
 	CHECK(clamp(15.0, minVal, maxVal) == doctest::Approx(10.0));
@@ -607,11 +606,11 @@ TEST_CASE("Template Function: clamp with doubles") {
 // P) Class template tests - at least 2 tests
 TEST_CASE("Template Class: DynamicArray stores and retrieves integers") {
 	DynamicArray<int> arr;
-
+	
 	arr += 10;
 	arr += 20;
 	arr += 30;
-
+	
 	CHECK(arr.getSize() == 3);
 	CHECK(arr[0] == 10);
 	CHECK(arr[1] == 20);
@@ -620,16 +619,16 @@ TEST_CASE("Template Class: DynamicArray stores and retrieves integers") {
 
 TEST_CASE("Template Class: DynamicArray removes and shifts") {
 	DynamicArray<int> arr;
-
+	
 	arr += 100;
 	arr += 200;
 	arr += 300;
 	arr += 400;
-
+	
 	CHECK(arr.getSize() == 4);
-
+	
 	arr -= 1;  // Remove 200
-
+	
 	CHECK(arr.getSize() == 3);
 	CHECK(arr[0] == 100);
 	CHECK(arr[1] == 300);  // Shifted from index 2
@@ -638,24 +637,24 @@ TEST_CASE("Template Class: DynamicArray removes and shifts") {
 
 TEST_CASE("Template Class: DynamicArray auto-resizes") {
 	DynamicArray<int> arr(2);  // Start with capacity 2
-
+	
 	CHECK(arr.getCapacity() == 2);
-
+	
 	arr += 1;
 	arr += 2;
 	arr += 3;  // Should trigger resize
-
+	
 	CHECK(arr.getSize() == 3);
 	CHECK(arr.getCapacity() == 4);  // Should have doubled
 }
 
 TEST_CASE("Template Class: DynamicArray with strings") {
 	DynamicArray<string> arr;
-
+	
 	arr += "Hello";
 	arr += "World";
 	arr += "Test";
-
+	
 	CHECK(arr.getSize() == 3);
 	CHECK(arr[0] == "Hello");
 	CHECK(arr[1] == "World");
@@ -665,10 +664,10 @@ TEST_CASE("Template Class: DynamicArray with strings") {
 TEST_CASE("Template Class: DynamicArray bounds checking") {
 	DynamicArray<int> arr;
 	arr += 42;
-
+	
 	// Valid access
 	CHECK(arr[0] == 42);
-
+	
 	// Invalid access - should throw InvalidIndexException
 	CHECK_THROWS_AS(arr[10], InvalidIndexException);
 }
@@ -1174,6 +1173,41 @@ TEST_CASE("SupplyList with LinkedList: Access items by index") {
 	CHECK(retrieved2.quantity == 2);
 }
 
+// ============= WEEK 13 TESTS - JSON DATA LOADING =============
+
+TEST_CASE("Week 13 JSON: loads recommended items into SupplyList")
+{
+	GeneralSupplies supply;
+
+	int loadedCount = supply.loadItemsFromJsonFile("camping_recommendations.json");
+
+	CHECK(loadedCount == 5);
+	CHECK(supply.getFoodCount() == 3);
+	CHECK(supply.getGearCount() == 2);
+	CHECK(supply.getFoodItem(0).itemName == "Trail Mix");
+	CHECK(supply.getGearItem(0).itemName == "First Aid Kit");
+}
+
+TEST_CASE("Week 13 JSON: missing file is handled")
+{
+	GeneralSupplies supply;
+
+	int loadedCount = supply.loadItemsFromJsonFile("missing_camping_file.json");
+
+	CHECK(loadedCount == 0);
+	CHECK(supply.getTotalItemCount() == 0);
+}
+
+TEST_CASE("Week 13 JSON: malformed file is handled")
+{
+	GeneralSupplies supply;
+
+	int loadedCount = supply.loadItemsFromJsonFile("malformed_camping.json");
+
+	CHECK(loadedCount == 0);
+	CHECK(supply.getTotalItemCount() == 0);
+}
+
 // ============= WEEK 11 TESTS - STACK AND QUEUE =============
 
 //***********************************************************
@@ -1500,6 +1534,9 @@ TEST_CASE("Queue - Mixed enqueue and dequeue operations")
 	CHECK(q.frontElement() == 40);
 }
 
+
+
+
 // ============= WEEK 11 TESTS - STACK/QUEUE INTEGRATION =============
 
 //***********************************************************
@@ -1509,11 +1546,11 @@ TEST_CASE("Queue - Mixed enqueue and dequeue operations")
 TEST_CASE("Integration: Itin undo single activity")
 {
 	Itin trip(3, medium);
-
+	
 	trip.addActivity("Hiking", high);
 	CHECK(trip.getActivityCount() == 1);
 	CHECK(trip.canUndo() == true);
-
+	
 	bool undone = trip.undoLastActivity();
 	CHECK(undone == true);
 	CHECK(trip.getActivityCount() == 0);
@@ -1522,13 +1559,13 @@ TEST_CASE("Integration: Itin undo single activity")
 TEST_CASE("Integration: Itin undo multiple activities")
 {
 	Itin trip(3, medium);
-
+	
 	trip.addActivity("Hiking", high);
 	trip.addActivity("Fishing", medium);
 	trip.addActivity("Swimming", low);
-
+	
 	CHECK(trip.getActivityCount() == 3);
-
+	
 	trip.undoLastActivity();
 	CHECK(trip.getActivityCount() == 2);
 	CHECK(trip.getActivity(0) == "Hiking");
@@ -1538,16 +1575,16 @@ TEST_CASE("Integration: Itin undo multiple activities")
 TEST_CASE("Integration: Itin redo after undo")
 {
 	Itin trip(2, high);
-
+	
 	trip.addActivity("Kayaking", high);
 	trip.addActivity("Camping", medium);
-
+	
 	CHECK(trip.getActivityCount() == 2);
-
+	
 	trip.undoLastActivity();
 	CHECK(trip.getActivityCount() == 1);
 	CHECK(trip.canRedo() == true);
-
+	
 	bool redone = trip.redoLastActivity();
 	CHECK(redone == true);
 	CHECK(trip.getActivityCount() == 2);
@@ -1557,7 +1594,7 @@ TEST_CASE("Integration: Itin redo after undo")
 TEST_CASE("Integration: Itin cannot undo when empty")
 {
 	Itin trip(1, low);
-
+	
 	CHECK(trip.canUndo() == false);
 	bool undone = trip.undoLastActivity();
 	CHECK(undone == false);
@@ -1566,7 +1603,7 @@ TEST_CASE("Integration: Itin cannot undo when empty")
 TEST_CASE("Integration: Itin cannot redo without undo")
 {
 	Itin trip(2, medium);
-
+	
 	trip.addActivity("Test", low);
 	CHECK(trip.canRedo() == false);
 	bool redone = trip.redoLastActivity();
@@ -1576,13 +1613,13 @@ TEST_CASE("Integration: Itin cannot redo without undo")
 TEST_CASE("Integration: Itin redo clears after new action")
 {
 	Itin trip(3, high);
-
+	
 	trip.addActivity("Activity1", low);
 	trip.addActivity("Activity2", medium);
-
+	
 	trip.undoLastActivity();
 	CHECK(trip.canRedo() == true);
-
+	
 	// Adding new activity should clear redo stack
 	trip.addActivity("Activity3", high);
 	CHECK(trip.canRedo() == false);
@@ -1591,18 +1628,18 @@ TEST_CASE("Integration: Itin redo clears after new action")
 TEST_CASE("Integration: Itin multiple undo/redo sequence")
 {
 	Itin trip(5, medium);
-
+	
 	trip.addActivity("A1", low);
 	trip.addActivity("A2", medium);
 	trip.addActivity("A3", high);
-
+	
 	CHECK(trip.getActivityCount() == 3);
-
+	
 	// Undo twice
 	trip.undoLastActivity();
 	trip.undoLastActivity();
 	CHECK(trip.getActivityCount() == 1);
-
+	
 	// Redo once
 	trip.redoLastActivity();
 	CHECK(trip.getActivityCount() == 2);
@@ -1617,14 +1654,14 @@ TEST_CASE("Integration: Itin multiple undo/redo sequence")
 TEST_CASE("Integration: Queue for packing order")
 {
 	Queue packingOrder;
-
+	
 	// Items added in priority order
 	packingOrder.enqueue(1);  // Tent (high priority)
 	packingOrder.enqueue(2);  // Sleeping bag
 	packingOrder.enqueue(3);  // Food
-
+	
 	CHECK(packingOrder.isEmptyQueue() == false);
-
+	
 	// Process items in FIFO order
 	CHECK(packingOrder.frontElement() == 1);
 	packingOrder.dequeue();
@@ -1636,12 +1673,12 @@ TEST_CASE("Integration: Queue for packing order")
 TEST_CASE("Integration: Stack for reverse printing")
 {
 	Stack reverseStack;
-
+	
 	// Push activities in order
 	reverseStack.push(1);  // First activity
 	reverseStack.push(2);  // Second activity
 	reverseStack.push(3);  // Third activity
-
+	
 	// Pop gives reverse order (LIFO)
 	CHECK(reverseStack.peek() == 3);
 	reverseStack.pop();
@@ -1650,163 +1687,6 @@ TEST_CASE("Integration: Stack for reverse printing")
 	CHECK(reverseStack.peek() == 1);
 }
 
-// ============= WEEK 12 TESTS - STL MAP =============
-
-//***********************************************************
-// STL Map Tests 
-//***********************************************************
-
-TEST_CASE("STLMap: Food map insert and lookup")
-{
-	GeneralSupplies supply;
-	SupplyList::inventoryItem item = { "Rice", SupplyList::food, low, 2 };
-
-	// Insert item into SupplyList and corresponding STL map
-	CHECK(supply.addFoodItem(item) == true);
-
-	int quantity = 0;
-	CHECK(supply.lookupFoodQuantity("Rice", quantity) == true);
-	CHECK(quantity == 2);
-}
-
-TEST_CASE("STLMap: Gear map insert and lookup")
-{
-	GeneralSupplies supply;
-	SupplyList::inventoryItem item = { "Tent", SupplyList::gear, high, 1 };
-
-	// Insert gear item and verify lookup by key
-	CHECK(supply.addGearItem(item) == true);
-
-	int quantity = 0;
-	CHECK(supply.lookupGearQuantity("Tent", quantity) == true);
-	CHECK(quantity == 1);
-}
-
-TEST_CASE("STLMap: Lookup non-existent food item")
-{
-	GeneralSupplies supply;
-	int quantity = 0;
-
-	// Lookup should fail when key does not exist
-	CHECK(supply.lookupFoodQuantity("GhostItem", quantity) == false);
-}
-
-TEST_CASE("STLMap: Lookup non-existent gear item")
-{
-	GeneralSupplies supply;
-	int quantity = 0;
-
-	// Lookup should fail when key does not exist
-	CHECK(supply.lookupGearQuantity("MissingGear", quantity) == false);
-}
-
-TEST_CASE("STLMap: Delete existing food item")
-{
-	GeneralSupplies supply;
-	SupplyList::inventoryItem item = { "Bread", SupplyList::food, medium, 3 };
-
-	CHECK(supply.addFoodItem(item) == true);
-	CHECK(supply.deleteFoodByName("Bread") == true);
-
-	int quantity = 0;
-	CHECK(supply.lookupFoodQuantity("Bread", quantity) == false);
-	CHECK(supply.getFoodCount() == 0);
-}
-
-TEST_CASE("STLMap: Delete existing gear item")
-{
-	GeneralSupplies supply;
-	SupplyList::inventoryItem item = { "Lantern", SupplyList::gear, medium, 2 };
-
-	CHECK(supply.addGearItem(item) == true);
-	CHECK(supply.deleteGearByName("Lantern") == true);
-
-	int quantity = 0;
-	CHECK(supply.lookupGearQuantity("Lantern", quantity) == false);
-	CHECK(supply.getGearCount() == 0);
-}
-
-TEST_CASE("STLMap: Delete non-existent food item")
-{
-	GeneralSupplies supply;
-
-	// Delete should fail gracefully when key does not exist
-	CHECK(supply.deleteFoodByName("NotThere") == false);
-}
-
-TEST_CASE("STLMap: Delete non-existent gear item")
-{
-	GeneralSupplies supply;
-
-	// Delete should fail gracefully when key does not exist
-	CHECK(supply.deleteGearByName("NoGear") == false);
-}
-
-TEST_CASE("STLMap: Food map tracks inserted items")
-{
-	GeneralSupplies supply;
-	SupplyList::inventoryItem item1 = { "Beans", SupplyList::food, low, 1 };
-	SupplyList::inventoryItem item2 = { "Pasta", SupplyList::food, medium, 4 };
-
-	CHECK(supply.addFoodItem(item1) == true);
-	CHECK(supply.addFoodItem(item2) == true);
-
-	// Iterate/display is supported by the map class;
-	// here we verify multiple key-value pairs were stored
-	CHECK(supply.getFoodMapSize() == 2);
-	CHECK_NOTHROW(supply.printFoodMap());
-}
-
-TEST_CASE("STLMap: Gear map tracks inserted items")
-{
-	GeneralSupplies supply;
-	SupplyList::inventoryItem item1 = { "Rope", SupplyList::gear, low, 1 };
-	SupplyList::inventoryItem item2 = { "Stove", SupplyList::gear, high, 1 };
-
-	CHECK(supply.addGearItem(item1) == true);
-	CHECK(supply.addGearItem(item2) == true);
-
-	CHECK(supply.getGearMapSize() == 2);
-	CHECK_NOTHROW(supply.printGearMap());
-}
-
-TEST_CASE("STLMap: clearAll clears LinkedLists and maps")
-{
-	GeneralSupplies supply;
-	SupplyList::inventoryItem foodItem = { "Apples", SupplyList::food, low, 5 };
-	SupplyList::inventoryItem gearItem = { "Cooler", SupplyList::gear, medium, 1 };
-
-	CHECK(supply.addFoodItem(foodItem) == true);
-	CHECK(supply.addGearItem(gearItem) == true);
-
-	CHECK(supply.getFoodCount() == 1);
-	CHECK(supply.getGearCount() == 1);
-	CHECK(supply.getFoodMapSize() == 1);
-	CHECK(supply.getGearMapSize() == 1);
-
-	supply.clearAll();
-
-	CHECK(supply.getFoodCount() == 0);
-	CHECK(supply.getGearCount() == 0);
-	CHECK(supply.getFoodMapSize() == 0);
-	CHECK(supply.getGearMapSize() == 0);
-}
-
-TEST_CASE("STLMap: Sequential search still works with map-enhanced lookup")
-{
-	GeneralSupplies supply;
-	SupplyList::inventoryItem item1 = { "Apple", SupplyList::food, low, 1 };
-	SupplyList::inventoryItem item2 = { "Bread", SupplyList::food, medium, 2 };
-
-	CHECK(supply.addFoodItem(item1) == true);
-	CHECK(supply.addFoodItem(item2) == true);
-
-	// sequentialSearchFood now uses the STL map
-	// to enhance the earlier LinkedList-based name lookup
-	CHECK(supply.sequentialSearchFood("Apple") == 0);
-	CHECK(supply.sequentialSearchFood("Bread") == 1);
-	CHECK(supply.sequentialSearchFood("Missing") == -1);
-}
 
 // ============= MAIN PROGRAM =============
 int main(int argc, char** argv)
@@ -1837,6 +1717,7 @@ int main(int argc, char** argv)
 	int firesPlanned;
 	bool raiseFlag = false;
 	GeneralSupplies supply;
+	const string jsonSupplyFile = "camping_recommendations.json";
 
 	colorText();
 
@@ -1864,6 +1745,15 @@ int main(int argc, char** argv)
 
 	// Create Itin object with nightsStaying from user input
 	Itin itinerary(nightsStaying, medium);
+
+	// Week 13 JSON: load recommended camping items into the existing SupplyList
+    // before user-entered extras are added.
+	int jsonItemsLoaded = supply.loadItemsFromJsonFile(jsonSupplyFile);
+
+	if (jsonItemsLoaded > 0)
+	{
+		cout << "# Loaded " << jsonItemsLoaded << " recommended items from JSON. #" << endl;
+	}
 
 	supply.extrasFunc(ch, MAX_ARRAY);
 
@@ -1946,7 +1836,7 @@ void bannerAndInput(string& name, int& campers, int& nightsStaying, int& firesPl
 	cin.ignore(50, '\n'); // ensure clean input
 	getline(cin, name);
 
-	cout << endl << endl << "#== Okay, " << left << setfill('=')
+	cout << endl << endl << "#== Okay, " << left << setfill('=') 
 		<< setw(25) << name + "  " << "=====#" << endl
 		<< "#== and how many campers will be going, #" << endl
 		<< "#=================  including yourself? #" << endl << endl;
@@ -2058,7 +1948,7 @@ void printSave(SupplyList& supply, Itin& itinerary, HikingSupplies& hikingSuppli
 			cout << right << setw(19) << setfill('.') << name
 				<< left << "'s Camp Supplies" << endl
 				<< showpoint << fixed << setprecision(2)
-				<< setw(28) << "Size of camping party:"
+				<< setw(28) << "Size of camping party:" 
 				<< right << setw(7) << campers << endl
 				<< left << setw(28) << "Duration of stay:"
 				<< right << setw(7) << nightsStaying << endl

@@ -18,4 +18,4 @@ jobs:
       - name: Build and run tests
         shell: cmd
         run: |
-          cl /nologo /EHsc /std:c++14 /MD /O2 /DRUN_TESTS CampingAssn1.cpp SupplyList.cpp Queue.cpp Stack.cpp STLMap.cpp HikingSupplies.cpp LogSelect.cpp Logs.cpp Menu.cpp Itin.cpp SupplyManager.cpp GeneralSupplies.cpp /Fe:CampingAssn1_tests.exe && CampingAssn1_tests.exe
+          cl /nologo /EHsc /std:c++14 /MD /O2 /DRUN_TESTS CampingAssn1.cpp SupplyList.cpp Queue.cpp Stack.cpp HikingSupplies.cpp LogSelect.cpp Logs.cpp Menu.cpp Itin.cpp SupplyManager.cpp GeneralSupplies.cpp /Fe:CampingAssn1_tests.exe && CampingAssn1_tests.exe
