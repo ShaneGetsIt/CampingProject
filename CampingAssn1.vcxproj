@@ -133,6 +133,7 @@
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Queue.cpp" />
     <ClCompile Include="Stack.cpp" />
+    <ClCompile Include="STLMap.cpp" />
     <ClCompile Include="SupplyList.cpp" />
     <ClCompile Include="SupplyManager.cpp" />
   </ItemGroup>
@@ -152,6 +153,7 @@
     <ClInclude Include="Menu.h" />
     <ClInclude Include="Queue.h" />
     <ClInclude Include="Stack.h" />
+    <ClInclude Include="STLMap.h" />
     <ClInclude Include="SupplyList.h" />
     <ClInclude Include="SupplyManager.h" />
   </ItemGroup>
